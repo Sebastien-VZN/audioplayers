@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-6.6.2-blueviolet?style=flat-square&logo=github" alt="Version"/>
+  <img src="https://img.shields.io/badge/Version-6.6.3-blueviolet?style=flat-square&logo=github" alt="Version"/>
   <img src="https://img.shields.io/badge/Release%20Date-2026--02--03-blue?style=flat-square&logo=calendar" alt="Release Date"/>
 </p>
 
