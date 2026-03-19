@@ -109,14 +109,16 @@ class AudioContextTabState extends State<AudioContextTab>
   }
 
   Future<void> updateAudioContextAndroid(
-      AudioContextAndroid contextAndroid) async {
+    AudioContextAndroid contextAndroid,
+  ) async {
     audioContext = audioContext.copy(android: contextAndroid);
     await _applyAudioContext(audioContext);
     setState(() {});
   }
 
   Future<void> updateAudioContextIOS(
-      AudioContextIOS Function() buildContextIOS) async {
+    AudioContextIOS Function() buildContextIOS,
+  ) async {
     try {
       final context = buildContextIOS();
       audioContext = audioContext.copy(iOS: context);

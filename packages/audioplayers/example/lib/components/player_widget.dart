@@ -127,7 +127,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 }
                 final position = value * duration.inMilliseconds;
                 unawaited(
-                    player.seek(Duration(milliseconds: position.round())));
+                  player.seek(Duration(milliseconds: position.round())),
+                );
               },
               value: (_position != null &&
                       _duration != null &&
