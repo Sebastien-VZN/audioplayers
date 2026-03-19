@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
 
 class LabeledDropDown<T> extends StatelessWidget {
-  final String label;
-  final Map<T, String> options;
-  final T selected;
-  final void Function(T?) onChange;
-
   const LabeledDropDown({
     required this.label,
     required this.options,
@@ -13,6 +8,10 @@ class LabeledDropDown<T> extends StatelessWidget {
     required this.onChange,
     super.key,
   });
+  final String label;
+  final Map<T, String> options;
+  final T selected;
+  final void Function(T?) onChange;
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +27,6 @@ class LabeledDropDown<T> extends StatelessWidget {
 }
 
 class CustomDropDown<T> extends StatelessWidget {
-  final Map<T, String> options;
-  final T selected;
-  final void Function(T?) onChange;
-  final bool isExpanded;
-
   const CustomDropDown({
     required this.options,
     required this.selected,
@@ -40,6 +34,10 @@ class CustomDropDown<T> extends StatelessWidget {
     this.isExpanded = false,
     super.key,
   });
+  final Map<T, String> options;
+  final T selected;
+  final void Function(T?) onChange;
+  final bool isExpanded;
 
   @override
   Widget build(BuildContext context) {

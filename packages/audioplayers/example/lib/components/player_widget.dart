@@ -5,9 +5,8 @@ import 'package:flutter/material.dart';
 
 // This code is also used in the example.md. Please keep it up to date.
 class PlayerWidget extends StatefulWidget {
-  final AudioPlayer player;
-
   const PlayerWidget({required this.player, super.key});
+  final AudioPlayer player;
 
   @override
   State<StatefulWidget> createState() {
@@ -16,14 +15,15 @@ class PlayerWidget extends StatefulWidget {
 }
 
 class _PlayerWidgetState extends State<PlayerWidget> {
+  Future<bool>? _initFuture;
   PlayerState? _playerState;
   Duration? _duration;
   Duration? _position;
 
-  StreamSubscription? _durationSubscription;
-  StreamSubscription? _positionSubscription;
-  StreamSubscription? _playerCompleteSubscription;
-  StreamSubscription? _playerStateChangeSubscription;
+  StreamSubscription<Duration>? _durationSubscription;
+  StreamSubscription<Duration>? _positionSubscription;
+  StreamSubscription<void>? _playerCompleteSubscription;
+  StreamSubscription<PlayerState>? _playerStateChangeSubscription;
 
   bool get _isPlaying => _playerState == PlayerState.playing;
 
@@ -38,19 +38,24 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   @override
   void initState() {
     super.initState();
+    _initFuture = _init();
+  }
+
+  Future<bool> _init() async {
     // Use initial values from player
     _playerState = player.state;
-    player.getDuration().then(
+    await player.getDuration().then(
           (value) => setState(() {
             _duration = value;
           }),
         );
-    player.getCurrentPosition().then(
+    await player.getCurrentPosition().then(
           (value) => setState(() {
             _position = value;
           }),
         );
     _initStreams();
+    return true;
   }
 
   @override
@@ -64,70 +69,84 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   @override
   void dispose() {
-    _durationSubscription?.cancel();
-    _positionSubscription?.cancel();
-    _playerCompleteSubscription?.cancel();
-    _playerStateChangeSubscription?.cancel();
+    unawaited(_durationSubscription?.cancel());
+    unawaited(_positionSubscription?.cancel());
+    unawaited(_playerCompleteSubscription?.cancel());
+    unawaited(_playerStateChangeSubscription?.cancel());
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final color = Theme.of(context).primaryColor;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Row(
+    return FutureBuilder<void>(
+      future: _initFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Center(child: Text('Erreur: ${snapshot.error}'));
+        }
+
+        return Column(
           mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              key: const Key('play_button'),
-              onPressed: _isPlaying ? null : _play,
-              iconSize: 48.0,
-              icon: const Icon(Icons.play_arrow),
-              color: color,
+          children: <Widget>[
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  key: const Key('play_button'),
+                  onPressed: _isPlaying ? null : _play,
+                  iconSize: 48,
+                  icon: const Icon(Icons.play_arrow),
+                  color: color,
+                ),
+                IconButton(
+                  key: const Key('pause_button'),
+                  onPressed: _isPlaying ? _pause : null,
+                  iconSize: 48,
+                  icon: const Icon(Icons.pause),
+                  color: color,
+                ),
+                IconButton(
+                  key: const Key('stop_button'),
+                  onPressed: _isPlaying || _isPaused ? _stop : null,
+                  iconSize: 48,
+                  icon: const Icon(Icons.stop),
+                  color: color,
+                ),
+              ],
             ),
-            IconButton(
-              key: const Key('pause_button'),
-              onPressed: _isPlaying ? _pause : null,
-              iconSize: 48.0,
-              icon: const Icon(Icons.pause),
-              color: color,
+            Slider(
+              onChanged: (value) {
+                final duration = _duration;
+                if (duration == null) {
+                  return;
+                }
+                final position = value * duration.inMilliseconds;
+                unawaited(
+                    player.seek(Duration(milliseconds: position.round())));
+              },
+              value: (_position != null &&
+                      _duration != null &&
+                      _position!.inMilliseconds > 0 &&
+                      _position!.inMilliseconds < _duration!.inMilliseconds)
+                  ? _position!.inMilliseconds / _duration!.inMilliseconds
+                  : 0.0,
             ),
-            IconButton(
-              key: const Key('stop_button'),
-              onPressed: _isPlaying || _isPaused ? _stop : null,
-              iconSize: 48.0,
-              icon: const Icon(Icons.stop),
-              color: color,
+            Text(
+              _position != null
+                  ? '$_positionText / $_durationText'
+                  : _duration != null
+                      ? _durationText
+                      : '',
+              style: const TextStyle(fontSize: 16),
             ),
           ],
-        ),
-        Slider(
-          onChanged: (value) {
-            final duration = _duration;
-            if (duration == null) {
-              return;
-            }
-            final position = value * duration.inMilliseconds;
-            player.seek(Duration(milliseconds: position.round()));
-          },
-          value: (_position != null &&
-                  _duration != null &&
-                  _position!.inMilliseconds > 0 &&
-                  _position!.inMilliseconds < _duration!.inMilliseconds)
-              ? _position!.inMilliseconds / _duration!.inMilliseconds
-              : 0.0,
-        ),
-        Text(
-          _position != null
-              ? '$_positionText / $_durationText'
-              : _duration != null
-                  ? _durationText
-                  : '',
-          style: const TextStyle(fontSize: 16.0),
-        ),
-      ],
+        );
+      },
     );
   }
 

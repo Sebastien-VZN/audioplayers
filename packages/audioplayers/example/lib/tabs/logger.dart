@@ -3,9 +3,8 @@ import 'package:audioplayers_example/components/btn.dart';
 import 'package:flutter/material.dart';
 
 class LoggerTab extends StatefulWidget {
-  final AudioPlayer player;
-
   const LoggerTab({required this.player, super.key});
+  final AudioPlayer player;
 
   @override
   LoggerTabState createState() => LoggerTabState();
@@ -127,16 +126,15 @@ class LoggerTabState extends State<LoggerTab>
 }
 
 class LogView extends StatelessWidget {
-  final String title;
-  final List<Log> logs;
-  final VoidCallback onDelete;
-
   const LogView({
     required this.logs,
     required this.title,
     required this.onDelete,
     super.key,
   });
+  final String title;
+  final List<Log> logs;
+  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {

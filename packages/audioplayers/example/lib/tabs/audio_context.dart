@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:audioplayers_example/components/cbx.dart';
 import 'package:audioplayers_example/components/drop_down.dart';
@@ -8,9 +10,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class AudioContextTab extends StatefulWidget {
-  final AudioPlayer player;
-
   const AudioContextTab({required this.player, super.key});
+  final AudioPlayer player;
 
   @override
   AudioContextTabState createState() => AudioContextTabState();
@@ -95,44 +96,43 @@ class AudioContextTabState extends State<AudioContextTab>
     );
   }
 
-  void updateConfig(AudioContextConfig newConfig) {
+  Future<void> updateConfig(AudioContextConfig newConfig) async {
     try {
       final context = newConfig.build();
-      setState(() {
-        audioContextConfig = newConfig;
-        audioContext = context;
-        _applyAudioContext(audioContext);
-      });
-    } on AssertionError catch (e) {
-      toast(e.message.toString());
+      audioContextConfig = newConfig;
+      audioContext = context;
+      await _applyAudioContext(audioContext);
+      setState(() {});
+    } on Exception catch (e) {
+      toast(e.toString());
     }
   }
 
-  void updateAudioContextAndroid(AudioContextAndroid contextAndroid) {
-    setState(() {
-      audioContext = audioContext.copy(android: contextAndroid);
-      _applyAudioContext(audioContext);
-    });
+  Future<void> updateAudioContextAndroid(
+      AudioContextAndroid contextAndroid) async {
+    audioContext = audioContext.copy(android: contextAndroid);
+    await _applyAudioContext(audioContext);
+    setState(() {});
   }
 
-  void updateAudioContextIOS(AudioContextIOS Function() buildContextIOS) {
+  Future<void> updateAudioContextIOS(
+      AudioContextIOS Function() buildContextIOS) async {
     try {
       final context = buildContextIOS();
-      setState(() {
-        audioContext = audioContext.copy(iOS: context);
-        _applyAudioContext(audioContext);
-      });
-    } on AssertionError catch (e) {
-      toast(e.message.toString());
+      audioContext = audioContext.copy(iOS: context);
+      await _applyAudioContext(audioContext);
+      setState(() {});
+    } on Exception catch (e) {
+      toast(e.toString());
     }
   }
 
-  void _applyAudioContext(AudioContext context) {
+  Future<void> _applyAudioContext(AudioContext context) async {
     if (isGlobal) {
-      _global.setAudioContext(context);
+      await _global.setAudioContext(context);
     }
     if (isLocal) {
-      player.setAudioContext(context);
+      await player.setAudioContext(context);
     }
   }
 
@@ -229,15 +229,17 @@ class AudioContextTabState extends State<AudioContextTab>
     final iosOptions = AVAudioSessionOptions.values.map((option) {
       final options = {...audioContext.iOS.options};
       return Cbx(option.name, value: options.contains(option), ({value}) {
-        updateAudioContextIOS(() {
-          final iosContext = audioContext.iOS.copy(options: options);
-          if (value ?? false) {
-            options.add(option);
-          } else {
-            options.remove(option);
-          }
-          return iosContext;
-        });
+        unawaited(
+          updateAudioContextIOS(() {
+            final iosContext = audioContext.iOS.copy(options: options);
+            if (value ?? false) {
+              options.add(option);
+            } else {
+              options.remove(option);
+            }
+            return iosContext;
+          }),
+        );
       });
     }).toList();
     return TabContent(

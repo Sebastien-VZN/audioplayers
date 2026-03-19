@@ -1,19 +1,18 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
 
 class AudioLogger {
   static AudioLogLevel logLevel = AudioLogLevel.error;
 
   static void log(String message) {
     if (AudioLogLevel.info.level <= logLevel.level) {
-      // ignore: avoid_print
-      print('AudioPlayers Log: $message');
+      debugPrint('AudioPlayers Log: $message');
     }
   }
 
   static void error(Object o, [StackTrace? stacktrace]) {
     if (AudioLogLevel.error.level <= logLevel.level) {
-      // ignore: avoid_print
-      print(_errorColor(errorToString(o, stacktrace)));
+      debugPrint(_errorColor(errorToString(o, stacktrace)));
     }
   }
 
@@ -36,10 +35,9 @@ class AudioLogger {
 }
 
 class AudioPlayerException implements Exception {
+  AudioPlayerException(this.player, {this.cause});
   Object? cause;
   AudioPlayer player;
-
-  AudioPlayerException(this.player, {this.cause});
 
   @override
   String toString() => 'AudioPlayerException(\n\t${player.source}, \n\t$cause';

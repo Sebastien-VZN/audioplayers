@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
 class TxtBox extends StatefulWidget {
+  const TxtBox({required this.value, required this.onChange, super.key});
   final String value;
   final void Function(String) onChange;
-
-  const TxtBox({required this.value, required this.onChange, super.key});
 
   @override
   State<TxtBox> createState() => _TxtBoxState();

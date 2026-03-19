@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:audioplayers_example/components/btn.dart';
 import 'package:audioplayers_example/components/list_tile.dart';
@@ -8,9 +10,8 @@ import 'package:audioplayers_example/utils.dart';
 import 'package:flutter/material.dart';
 
 class ControlsTab extends StatefulWidget {
-  final AudioPlayer player;
-
   const ControlsTab({required this.player, super.key});
+  final AudioPlayer player;
 
   @override
   State<ControlsTab> createState() => _ControlsTabState();
@@ -151,15 +152,17 @@ class _ControlsTabState extends State<ControlsTab>
             Btn(
               txt: 'Custom',
               onPressed: () async {
-                dialog(
-                  _SeekDialog(
-                    value: modalInputSeek,
-                    setValue: (it) => setState(() => modalInputSeek = it),
-                    seekDuration: () => _seekDuration(
-                      Duration(milliseconds: int.parse(modalInputSeek)),
+                unawaited(
+                  dialog(
+                    _SeekDialog(
+                      value: modalInputSeek,
+                      setValue: (it) => setState(() => modalInputSeek = it),
+                      seekDuration: () => _seekDuration(
+                        Duration(milliseconds: int.parse(modalInputSeek)),
+                      ),
+                      seekPercent: () =>
+                          _seekPercent(double.parse(modalInputSeek)),
                     ),
-                    seekPercent: () =>
-                        _seekPercent(double.parse(modalInputSeek)),
                   ),
                 );
               },
@@ -175,17 +178,16 @@ class _ControlsTabState extends State<ControlsTab>
 }
 
 class _SeekDialog extends StatelessWidget {
-  final VoidCallback seekDuration;
-  final VoidCallback seekPercent;
-  final void Function(String val) setValue;
-  final String value;
-
   const _SeekDialog({
     required this.seekDuration,
     required this.seekPercent,
     required this.value,
     required this.setValue,
   });
+  final VoidCallback seekDuration;
+  final VoidCallback seekPercent;
+  final void Function(String val) setValue;
+  final String value;
 
   @override
   Widget build(BuildContext context) {

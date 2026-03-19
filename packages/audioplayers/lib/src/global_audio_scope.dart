@@ -7,6 +7,10 @@ GlobalAudioplayersPlatformInterface? _lastGlobalAudioplayersPlatform;
 
 /// Handle global audio scope like calls and events concerning all AudioPlayers.
 class GlobalAudioScope {
+  GlobalAudioScope() {
+    eventStream = _platform.getGlobalEventStream();
+    onLog.listen(AudioLogger.log, onError: AudioLogger.error);
+  }
   Completer<void>? _initCompleter;
 
   GlobalAudioplayersPlatformInterface get _platform =>
@@ -19,11 +23,6 @@ class GlobalAudioScope {
   Stream<String> get onLog => eventStream
       .where((event) => event.eventType == GlobalAudioEventType.log)
       .map((event) => event.logMessage!);
-
-  GlobalAudioScope() {
-    eventStream = _platform.getGlobalEventStream();
-    onLog.listen(AudioLogger.log, onError: AudioLogger.error);
-  }
 
   /// Ensure the global platform is initialized.
   Future<void> ensureInitialized() async {

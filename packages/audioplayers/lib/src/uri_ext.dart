@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 extension UriCoder on Uri {
   static String encodeOnce(String uri) {
     try {
@@ -6,7 +8,9 @@ extension UriCoder on Uri {
       if (decodedUri != uri) {
         return uri;
       }
-    } on ArgumentError catch (_) {}
+    } on Exception catch (args) {
+      debugPrint("ERROR encodeOnce $args");
+    }
     return Uri.encodeFull(uri);
   }
 }

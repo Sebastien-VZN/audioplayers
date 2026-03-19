@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 
 class WrappedListTile extends StatelessWidget {
-  final List<Widget> children;
-  final Widget? leading;
-  final Widget? trailing;
-
   const WrappedListTile({
     required this.children,
     this.leading,
     this.trailing,
     super.key,
   });
+  final List<Widget> children;
+  final Widget? leading;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {

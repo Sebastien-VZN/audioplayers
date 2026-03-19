@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -40,9 +41,8 @@ const mp3DataUri =
     'data:audio/mpeg;base64,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';
 
 class SourcesTab extends StatefulWidget {
-  final AudioPlayer player;
-
   const SourcesTab({required this.player, super.key});
+  final AudioPlayer player;
 
   @override
   State<SourcesTab> createState() => _SourcesTabState();
@@ -260,19 +260,21 @@ class _SourcesTabState extends State<SourcesTab>
           child: FloatingActionButton(
             child: const Icon(Icons.add),
             onPressed: () {
-              dialog(
-                _SourceDialog(
-                  onAdd: (Source source, String path) {
-                    setState(() {
-                      sourceWidgets.add(
-                        _createSourceTile(
-                          title: source.runtimeType.toString(),
-                          subtitle: path,
-                          source: source,
-                        ),
-                      );
-                    });
-                  },
+              unawaited(
+                dialog(
+                  _SourceDialog(
+                    onAdd: (source, path) {
+                      setState(() {
+                        sourceWidgets.add(
+                          _createSourceTile(
+                            title: source.runtimeType.toString(),
+                            subtitle: path,
+                            source: source,
+                          ),
+                        );
+                      });
+                    },
+                  ),
                 ),
               );
             },
@@ -286,16 +288,27 @@ class _SourcesTabState extends State<SourcesTab>
   bool get wantKeepAlive => true;
 }
 
-class _SourceTile extends StatelessWidget {
-  final Future<void> Function() setSource;
-  final Future<void> Function() play;
-  final void Function(Widget sourceWidget) removeSource;
-  final String title;
-  final String? subtitle;
-  final Key? setSourceKey;
-  final Key? playKey;
-  final Color? buttonColor;
+enum _SourceType {
+  url,
+  asset,
+  deviceFile,
+  bytes;
 
+  String get label {
+    switch (this) {
+      case _SourceType.url:
+        return 'Url';
+      case _SourceType.asset:
+        return 'Asset';
+      case _SourceType.deviceFile:
+        return 'Device File';
+      case _SourceType.bytes:
+        return 'Byte Array';
+    }
+  }
+}
+
+class _SourceTile extends StatelessWidget {
   const _SourceTile({
     required this.setSource,
     required this.play,
@@ -306,6 +319,14 @@ class _SourceTile extends StatelessWidget {
     this.playKey,
     this.buttonColor,
   });
+  final Future<void> Function() setSource;
+  final Future<void> Function() play;
+  final void Function(Widget sourceWidget) removeSource;
+  final String title;
+  final String? subtitle;
+  final Key? setSourceKey;
+  final Key? playKey;
+  final Color? buttonColor;
 
   @override
   Widget build(BuildContext context) {
@@ -354,16 +375,16 @@ class _SourceTile extends StatelessWidget {
 }
 
 class _SourceDialog extends StatefulWidget {
-  final void Function(Source source, String path) onAdd;
-
   const _SourceDialog({required this.onAdd});
+  final void Function(Source source, String path) onAdd;
 
   @override
   State<_SourceDialog> createState() => _SourceDialogState();
 }
 
 class _SourceDialogState extends State<_SourceDialog> {
-  Type sourceType = UrlSource;
+  Future<bool>? _initFuture;
+  _SourceType sourceType = _SourceType.url;
   String path = '';
 
   final Map<String, String> assetsList = {'': 'Nothing selected'};
@@ -371,8 +392,11 @@ class _SourceDialogState extends State<_SourceDialog> {
   @override
   void initState() {
     super.initState();
+    _initFuture = _init();
+  }
 
-    AssetManifest.loadFromAssetBundle(rootBundle).then((assetManifest) {
+  Future<bool> _init() async {
+    await AssetManifest.loadFromAssetBundle(rootBundle).then((assetManifest) {
       setState(() {
         assetsList.addAll(
           assetManifest
@@ -384,11 +408,13 @@ class _SourceDialogState extends State<_SourceDialog> {
         );
       });
     });
+
+    return true;
   }
 
   Widget _buildSourceValue() {
     switch (sourceType) {
-      case const (AssetSource):
+      case _SourceType.asset:
         return Row(
           children: [
             const Text('Asset path'),
@@ -404,8 +430,8 @@ class _SourceDialogState extends State<_SourceDialog> {
             ),
           ],
         );
-      case const (BytesSource):
-      case const (DeviceFileSource):
+      case _SourceType.bytes:
+      case _SourceType.deviceFile:
         return Row(
           children: [
             const Text('Device File path'),
@@ -426,7 +452,7 @@ class _SourceDialogState extends State<_SourceDialog> {
             ),
           ],
         );
-      default:
+      case _SourceType.url:
         return Row(
           children: [
             const Text('URL'),
@@ -436,7 +462,7 @@ class _SourceDialogState extends State<_SourceDialog> {
                 decoration: const InputDecoration(
                   hintText: 'https://example.com/myFile.wav',
                 ),
-                onChanged: (String? url) => path = url ?? '',
+                onChanged: (url) => path = url,
               ),
             ),
           ],
@@ -446,58 +472,68 @@ class _SourceDialogState extends State<_SourceDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        LabeledDropDown<Type>(
-          label: 'Source type',
-          options: const {
-            AssetSource: 'Asset',
-            DeviceFileSource: 'Device File',
-            UrlSource: 'Url',
-            BytesSource: 'Byte Array',
-          },
-          selected: sourceType,
-          onChange: (Type? value) {
-            setState(() {
-              if (value != null) {
-                sourceType = value;
-              }
-            });
-          },
-        ),
-        ListTile(title: _buildSourceValue()),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+    return FutureBuilder<void>(
+      future: _initFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Center(child: Text('Erreur: ${snapshot.error}'));
+        }
+
+        return Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Btn(
-              onPressed: () async {
-                switch (sourceType) {
-                  case const (BytesSource):
-                    widget.onAdd(
-                      BytesSource(await File(path).readAsBytes()),
-                      path,
-                    );
-                  case const (AssetSource):
-                    widget.onAdd(AssetSource(path), path);
-                  case const (DeviceFileSource):
-                    widget.onAdd(DeviceFileSource(path), path);
-                  default:
-                    widget.onAdd(UrlSource(path), path);
-                }
-                if (context.mounted) {
-                  Navigator.of(context).pop();
-                }
+            LabeledDropDown<_SourceType>(
+              label: 'Source type',
+              options: {
+                for (final type in _SourceType.values) type: type.label,
               },
-              txt: 'Add',
+              selected: sourceType,
+              onChange: (value) {
+                setState(() {
+                  if (value != null) {
+                    sourceType = value;
+                  }
+                });
+              },
             ),
-            TextButton(
-              onPressed: Navigator.of(context).pop,
-              child: const Text('Cancel'),
+            ListTile(title: _buildSourceValue()),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Btn(
+                  onPressed: () async {
+                    switch (sourceType) {
+                      case _SourceType.bytes:
+                        widget.onAdd(
+                          BytesSource(await File(path).readAsBytes()),
+                          path,
+                        );
+                      case _SourceType.asset:
+                        widget.onAdd(AssetSource(path), path);
+                      case _SourceType.deviceFile:
+                        widget.onAdd(DeviceFileSource(path), path);
+                      case _SourceType.url:
+                        widget.onAdd(UrlSource(path), path);
+                    }
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  txt: 'Add',
+                ),
+                TextButton(
+                  onPressed: Navigator.of(context).pop,
+                  child: const Text('Cancel'),
+                ),
+              ],
             ),
           ],
-        ),
-      ],
+        );
+      },
     );
   }
 }

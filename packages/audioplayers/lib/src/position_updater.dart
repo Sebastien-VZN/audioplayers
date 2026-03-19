@@ -34,11 +34,10 @@ abstract class PositionUpdater {
 }
 
 class TimerPositionUpdater extends PositionUpdater {
-  Timer? _positionStreamTimer;
-  final Duration interval;
-
   /// Position stream will be updated in the according [interval].
   TimerPositionUpdater({required super.getPosition, required this.interval});
+  Timer? _positionStreamTimer;
+  final Duration interval;
 
   @override
   void start() {
@@ -56,15 +55,14 @@ class TimerPositionUpdater extends PositionUpdater {
 }
 
 class FramePositionUpdater extends PositionUpdater {
+  /// Position stream will be updated at every new frame.
+  FramePositionUpdater({required super.getPosition});
   int? _frameCallbackId;
   bool _isRunning = false;
 
-  /// Position stream will be updated at every new frame.
-  FramePositionUpdater({required super.getPosition});
-
-  void _tick(Duration? timestamp) {
+  Future<void> _tick(Duration? timestamp) async {
     if (_isRunning) {
-      update();
+      await update();
       _frameCallbackId = SchedulerBinding.instance.scheduleFrameCallback(_tick);
     }
   }
@@ -72,7 +70,7 @@ class FramePositionUpdater extends PositionUpdater {
   @override
   void start() {
     _isRunning = true;
-    _tick(null);
+    unawaited(_tick(null));
   }
 
   @override

@@ -18,11 +18,16 @@ const _uuid = Uuid();
 /// It holds methods to play, loop, pause, stop, seek the audio, and some useful
 /// hooks for handlers and callbacks.
 class AudioPlayer {
+  /// Creates a new instance and assigns an unique id to it.
+  AudioPlayer({String? playerId}) : playerId = playerId ?? _uuid.v4() {
+    unawaited(_init());
+  }
+
   static final global = GlobalAudioScope();
   static Duration preparationTimeout = const Duration(seconds: 30);
   static Duration seekingTimeout = const Duration(seconds: 30);
-
-  final _platform = AudioplayersPlatformInterface.instance;
+  final AudioplayersPlatformInterface _platform =
+      AudioplayersPlatformInterface.instance;
 
   /// This is the [AudioCache] instance used by this player.
   /// Unless you want to control multiple caches separately, you don't need to
@@ -38,15 +43,15 @@ class AudioPlayer {
 
   Source? get source => _source;
 
-  double _volume = 1.0;
+  double _volume = 1;
 
   double get volume => _volume;
 
-  double _balance = 0.0;
+  double _balance = 0;
 
   double get balance => _balance;
 
-  double _playbackRate = 1.0;
+  double _playbackRate = 1;
 
   double get playbackRate => _playbackRate;
 
@@ -88,14 +93,14 @@ class AudioPlayer {
   @visibleForTesting
   final creatingCompleter = Completer<void>();
 
-  late final StreamSubscription _onPlayerCompleteStreamSubscription;
+  late final StreamSubscription<dynamic> _onPlayerCompleteStreamSubscription;
 
-  late final StreamSubscription _onLogStreamSubscription;
+  late final StreamSubscription<dynamic> _onLogStreamSubscription;
 
   /// Stream controller to be able to get a stream on initialization, before the
   /// native event stream is ready via [_create] method.
   final _eventStreamController = StreamController<AudioEvent>.broadcast();
-  late final StreamSubscription _eventStreamSubscription;
+  late final StreamSubscription<dynamic> _eventStreamSubscription;
 
   Stream<AudioEvent> get eventStream => _eventStreamController.stream;
 
@@ -147,13 +152,13 @@ class AudioPlayer {
       .where((event) => event.eventType == AudioEventType.log)
       .map((event) => event.logMessage!);
 
-  /// Creates a new instance and assigns an unique id to it.
-  AudioPlayer({String? playerId}) : playerId = playerId ?? _uuid.v4() {
+  Future<void> _init() async {
     _onLogStreamSubscription = onLog.listen(
       (log) => AudioLogger.log('$log\nSource: $_source'),
       onError: (Object e, [StackTrace? stackTrace]) =>
           AudioLogger.error(AudioPlayerException(this, cause: e), stackTrace),
     );
+
     _onPlayerCompleteStreamSubscription = onPlayerComplete.listen(
       (_) async {
         state = PlayerState.completed;
@@ -166,8 +171,9 @@ class AudioPlayer {
         /* Errors are already handled via log stream */
       },
     );
-    _create();
-    positionUpdater = FramePositionUpdater(getPosition: getCurrentPosition);
+
+    await _create();
+    positionUpdater(FramePositionUpdater(getPosition: getCurrentPosition));
   }
 
   Future<void> _create() async {
@@ -471,8 +477,8 @@ class AudioPlayer {
   /// updated. You can use the [FramePositionUpdater], the
   /// [TimerPositionUpdater] or write your own implementation of the
   /// [PositionUpdater].
-  set positionUpdater(PositionUpdater? positionUpdater) {
-    _positionUpdater?.dispose(); // No need to wait for dispose
+  void positionUpdater(PositionUpdater? positionUpdater) {
+    unawaited(_positionUpdater?.dispose()); // No need to wait for dispose
     _positionUpdater = positionUpdater;
   }
 
@@ -510,7 +516,7 @@ class AudioPlayer {
 
     state = desiredState = PlayerState.disposed;
 
-    final futures = <Future>[
+    final futures = [
       if (_positionUpdater != null) _positionUpdater!.dispose(),
       if (!_playerStateController.isClosed) _playerStateController.close(),
       _onPlayerCompleteStreamSubscription.cancel(),

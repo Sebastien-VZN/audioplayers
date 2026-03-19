@@ -16,6 +16,14 @@ typedef StopFunction = Future<void> Function();
 /// Use this class if you for example have extremely quick firing, repetitive
 /// or simultaneous sounds.
 class AudioPool {
+  AudioPool._({
+    required this.minPlayers,
+    required this.maxPlayers,
+    required this.source,
+    required this.audioContext,
+    this.playerMode = PlayerMode.mediaPlayer,
+    AudioCache? audioCache,
+  }) : audioCache = audioCache ?? AudioCache.instance;
   @visibleForTesting
   final Map<String, AudioPlayer> currentPlayers = {};
   @visibleForTesting
@@ -46,15 +54,6 @@ class AudioPool {
 
   /// Lock to synchronize access to the pool.
   final Lock _lock = Lock();
-
-  AudioPool._({
-    required this.minPlayers,
-    required this.maxPlayers,
-    required this.source,
-    required this.audioContext,
-    this.playerMode = PlayerMode.mediaPlayer,
-    AudioCache? audioCache,
-  }) : audioCache = audioCache ?? AudioCache.instance;
 
   /// Creates an [AudioPool] instance with the given parameters.
   /// You will have to manage disposing the players if you choose
@@ -132,8 +131,7 @@ class AudioPool {
       }
 
       if (playerMode != PlayerMode.lowLatency) {
-        subscription =
-            player.onPlayerComplete.listen((_) async => await stop());
+        subscription = player.onPlayerComplete.listen((_) async => stop());
       }
 
       return stop;

@@ -82,8 +82,7 @@ void main() {
         .thenAnswer((_) async => 0);
     when(() => mockPlatform.getDuration(any())).thenAnswer((_) async => 0);
 
-    player = AudioPlayer();
-    player.audioCache = mockCache;
+    player = AudioPlayer()..audioCache = mockCache;
   });
 
   tearDown(() async {
@@ -100,7 +99,7 @@ void main() {
 
       final playFuture =
           player.play(UrlSource('https://example.com/audio.mp3'));
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future<void>.delayed(const Duration(milliseconds: 100));
       eventController.add(
         const AudioEvent(
           eventType: AudioEventType.prepared,
@@ -128,7 +127,7 @@ void main() {
           .thenAnswer((_) async => 'assets/sounds/test.mp3');
 
       final playFuture = player.play(AssetSource('sounds/test.mp3'));
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future<void>.delayed(const Duration(milliseconds: 100));
       eventController.add(
         const AudioEvent(
           eventType: AudioEventType.prepared,
@@ -155,7 +154,7 @@ void main() {
       final bytes = Uint8List.fromList([0, 1, 2, 3]);
 
       final playFuture = player.play(BytesSource(bytes));
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future<void>.delayed(const Duration(milliseconds: 100));
       eventController.add(
         const AudioEvent(
           eventType: AudioEventType.prepared,
@@ -191,7 +190,7 @@ void main() {
       await player.creatingCompleter.future;
 
       final seekFuture = player.seek(const Duration(seconds: 10));
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future<void>.delayed(const Duration(milliseconds: 100));
       eventController.add(
         const AudioEvent(eventType: AudioEventType.seekComplete),
       );
@@ -207,8 +206,8 @@ void main() {
       await player.setVolume(0.5);
       verify(() => mockPlatform.setVolume(player.playerId, 0.5)).called(1);
 
-      await player.setBalance(-1.0);
-      verify(() => mockPlatform.setBalance(player.playerId, -1.0)).called(1);
+      await player.setBalance(-1);
+      verify(() => mockPlatform.setBalance(player.playerId, -1)).called(1);
 
       await player.setPlaybackRate(1.5);
       verify(() => mockPlatform.setPlaybackRate(player.playerId, 1.5))

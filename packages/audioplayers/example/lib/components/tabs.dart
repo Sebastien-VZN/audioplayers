@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
 class Tabs extends StatelessWidget {
-  final List<TabData> tabs;
-
   const Tabs({required this.tabs, super.key});
+  final List<TabData> tabs;
 
   @override
   Widget build(BuildContext context) {
@@ -37,9 +36,8 @@ class Tabs extends StatelessWidget {
 }
 
 class TabData {
+  TabData({required this.label, required this.content, this.key});
   final String? key;
   final String label;
   final Widget content;
-
-  TabData({required this.label, required this.content, this.key});
 }

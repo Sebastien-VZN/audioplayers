@@ -12,8 +12,8 @@ extension StateExt<T extends StatefulWidget> on State<T> {
     );
   }
 
-  void simpleDialog(String message, [String action = 'Ok']) {
-    showDialog<void>(
+  Future<void> simpleDialog(String message, [String action = 'Ok']) async {
+    await showDialog<void>(
       context: context,
       builder: (_) {
         return SimpleDlg(message: message, action: action);
@@ -21,8 +21,8 @@ extension StateExt<T extends StatefulWidget> on State<T> {
     );
   }
 
-  void dialog(Widget child) {
-    showDialog<void>(
+  Future<void> dialog(Widget child) async {
+    await showDialog<void>(
       context: context,
       builder: (_) {
         return Dlg(child: child);

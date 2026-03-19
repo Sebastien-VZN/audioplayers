@@ -3,9 +3,8 @@ import 'package:audioplayers_example/utils.dart';
 import 'package:flutter/material.dart';
 
 class PropertiesWidget extends StatefulWidget {
-  final AudioPlayer player;
-
   const PropertiesWidget({required this.player, super.key});
+  final AudioPlayer player;
 
   @override
   State<PropertiesWidget> createState() => _PropertiesWidgetState();

@@ -15,12 +15,11 @@ abstract class Source {
 /// Source representing a remote URL to be played from the Internet.
 /// This can be an audio file to be downloaded or an audio stream.
 class UrlSource extends Source {
+  UrlSource(this.url, {this.mimeType});
   final String url;
 
   @override
   final String? mimeType;
-
-  UrlSource(this.url, {this.mimeType});
 
   @override
   Future<void> setOnPlayer(AudioPlayer player) {
@@ -36,12 +35,11 @@ class UrlSource extends Source {
 
 /// Source representing the absolute path of a file in the user's device.
 class DeviceFileSource extends Source {
+  DeviceFileSource(this.path, {this.mimeType});
   final String path;
 
   @override
   final String? mimeType;
-
-  DeviceFileSource(this.path, {this.mimeType});
 
   @override
   Future<void> setOnPlayer(AudioPlayer player) {
@@ -59,12 +57,11 @@ class DeviceFileSource extends Source {
 /// Note that a prefix might be applied by your [AudioPlayer]'s audio cache
 /// instance.
 class AssetSource extends Source {
+  AssetSource(this.path, {this.mimeType});
   final String path;
 
   @override
   final String? mimeType;
-
-  AssetSource(this.path, {this.mimeType});
 
   @override
   Future<void> setOnPlayer(AudioPlayer player) {
@@ -79,12 +76,11 @@ class AssetSource extends Source {
 
 /// Source containing the actual bytes of the media to be played.
 class BytesSource extends Source {
+  BytesSource(this.bytes, {this.mimeType});
   final Uint8List bytes;
 
   @override
   final String? mimeType;
-
-  BytesSource(this.bytes, {this.mimeType});
 
   @override
   Future<void> setOnPlayer(AudioPlayer player) {

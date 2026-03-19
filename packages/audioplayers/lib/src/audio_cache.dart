@@ -25,6 +25,9 @@ const _uuid = Uuid();
 /// For most normal uses, the static instance is used. But if you want to
 /// control multiple caches, you can create your own instances.
 class AudioCache {
+  AudioCache({this.prefix = 'assets/', String? cacheId})
+      : cacheId = cacheId ?? _uuid.v4();
+
   /// A globally accessible instance used by default by all players.
   static AudioCache instance = AudioCache();
 
@@ -53,9 +56,6 @@ class AudioCache {
   /// This is used to load a file into an unique location in the temporary
   /// directory.
   String? cacheId;
-
-  AudioCache({this.prefix = 'assets/', String? cacheId})
-      : cacheId = cacheId ?? _uuid.v4();
 
   /// Clears the cache for the file [fileName].
   ///
@@ -159,7 +159,7 @@ class AudioCache {
   /// browser!
   Future<File> loadAsFile(String fileName) async {
     if (kIsWeb) {
-      throw 'This method cannot be used on web!';
+      debugPrint('❌ This method cannot be used on web!');
     }
     final uri = await load(fileName);
     return fileSystem.file(

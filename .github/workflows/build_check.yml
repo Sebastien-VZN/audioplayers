@@ -1,4 +1,4 @@
-name: Build Check
+name: Build Check & Release
 
 on:
   push:
@@ -31,7 +31,7 @@ jobs:
 
 
   android-build:
-    name: "Android (APK Build Check)"
+    name: "Android (APK Build)"
     needs: validate
     runs-on: ubuntu-latest
     steps:
@@ -46,9 +46,14 @@ jobs:
       - name: "Build APK (Release)"
         working-directory: packages/audioplayers/example
         run: flutter build apk --release
+      - name: "Upload APK"
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: packages/audioplayers/example/build/app/outputs/flutter-apk/app-release.apk
 
   linux-build:
-    name: "Linux (Build Check)"
+    name: "Linux (Build)"
     needs: validate
     runs-on: ubuntu-latest
     steps:
@@ -65,9 +70,17 @@ jobs:
       - name: "Build Linux (Release)"
         working-directory: packages/audioplayers/example
         run: flutter build linux --release
+      - name: "Archive Linux Build"
+        working-directory: packages/audioplayers/example/build/linux/x64/release/bundle
+        run: tar -czvf $GITHUB_WORKSPACE/audioplayers-linux.tar.gz .
+      - name: "Upload Linux"
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-build
+          path: audioplayers-linux.tar.gz
 
   windows-build:
-    name: "Windows (Build Check)"
+    name: "Windows (Build)"
     needs: validate
     runs-on: windows-latest
     steps:
@@ -80,9 +93,18 @@ jobs:
       - name: "Build Windows (Release)"
         working-directory: packages/audioplayers/example
         run: flutter build windows --release
+      - name: "Archive Windows Build"
+        shell: pwsh
+        run: |
+          Compress-Archive -Path packages/audioplayers/example/build/windows/x64/runner/Release/* -DestinationPath audioplayers-windows.zip
+      - name: "Upload Windows"
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: audioplayers-windows.zip
 
   web-build:
-    name: "Web (Build Check)"
+    name: "Web (Build)"
     needs: validate
     runs-on: ubuntu-latest
     steps:
@@ -93,9 +115,17 @@ jobs:
       - name: "Build Web (Release)"
         working-directory: packages/audioplayers/example
         run: flutter build web --release
+      - name: "Archive Web Build"
+        working-directory: packages/audioplayers/example/build/web
+        run: zip -r $GITHUB_WORKSPACE/audioplayers-web.zip .
+      - name: "Upload Web"
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: audioplayers-web.zip
 
   macos-build:
-    name: "macOS (Build Check)"
+    name: "macOS (Build)"
     needs: validate
     runs-on: macos-latest
     steps:
@@ -106,9 +136,17 @@ jobs:
       - name: "Build macOS (Release)"
         working-directory: packages/audioplayers/example
         run: flutter build macos --release
+      - name: "Archive macOS Build"
+        working-directory: packages/audioplayers/example/build/macos/Build/Products/Release
+        run: zip -r $GITHUB_WORKSPACE/audioplayers-macos.zip *.app
+      - name: "Upload macOS"
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build
+          path: audioplayers-macos.zip
 
   ios-build:
-    name: "iOS (Build Check)"
+    name: "iOS (Build)"
     needs: validate
     runs-on: macos-latest
     steps:
@@ -119,3 +157,79 @@ jobs:
       - name: "Build iOS (Release)"
         working-directory: packages/audioplayers/example
         run: flutter build ios --release --no-codesign
+      - name: "Archive iOS Build"
+        working-directory: packages/audioplayers/example/build/ios/iphoneos
+        run: zip -r $GITHUB_WORKSPACE/audioplayers-ios.zip Runner.app
+      - name: "Upload iOS"
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build
+          path: audioplayers-ios.zip
+
+  release:
+    name: "Création de la Release GitHub"
+    needs: [android-build, linux-build, windows-build, web-build, macos-build, ios-build]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Extraire la version"
+        id: get_version
+        run: |
+          VERSION=$(grep '^version: ' packages/audioplayers/pubspec.yaml | head -1 | sed 's/version: //')
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "TAG=v$VERSION" >> $GITHUB_OUTPUT
+
+      - name: "Mettre à jour le README (version & date)"
+        run: |
+          VERSION=${{ steps.get_version.outputs.VERSION }}
+          DATE=$(date +%Y--%m--%d)
+          sed -i "s/Version-[0-9.]*-blueviolet/Version-${VERSION}-blueviolet/" README.md
+          sed -i "s/Release%20Date-[0-9-]*-blue/Release%20Date-${DATE}-blue/" README.md
+
+      - name: "Commit README"
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git diff --quiet README.md || {
+            git add README.md
+            git commit -m "docs: update README version to ${{ steps.get_version.outputs.VERSION }}"
+            git push
+          }
+
+      - name: "Vérifier si le tag existe déjà"
+        run: |
+          if git rev-parse "${{ steps.get_version.outputs.TAG }}" >/dev/null 2>&1; then
+            echo "::error::Le tag ${{ steps.get_version.outputs.TAG }} existe déjà. Mettez à jour la version dans pubspec.yaml."
+            exit 1
+          fi
+
+      - name: "Download Artifacts"
+        uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+
+      - name: "Préparer les fichiers de release"
+        run: |
+          mkdir deploy
+          cp release-artifacts/android-apk/app-release.apk deploy/audioplayers-android.apk
+          cp release-artifacts/linux-build/audioplayers-linux.tar.gz deploy/
+          cp release-artifacts/windows-build/audioplayers-windows.zip deploy/
+          cp release-artifacts/web-build/audioplayers-web.zip deploy/
+          cp release-artifacts/macos-build/audioplayers-macos.zip deploy/
+          cp release-artifacts/ios-build/audioplayers-ios.zip deploy/
+
+      - name: "Créer la Release GitHub"
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.get_version.outputs.TAG }}
+          name: Release ${{ steps.get_version.outputs.VERSION }}
+          files: deploy/*
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
