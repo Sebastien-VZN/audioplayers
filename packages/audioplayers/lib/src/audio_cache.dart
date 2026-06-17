@@ -133,7 +133,7 @@ class AudioCache {
     // see https://developer.android.com/training/data-storage/app-specific#internal-remove-cache
     if (!needsFetch &&
         defaultTargetPlatform == TargetPlatform.android &&
-        !await fileSystem.file(loadedFiles[fileName]).exists()) {
+        !fileSystem.file(loadedFiles[fileName]).existsSync()) {
       needsFetch = true;
     }
 
