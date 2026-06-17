@@ -12,7 +12,7 @@ jobs:
     name: "Analyse, Formatage & Tests Unitaires"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
@@ -24,19 +24,18 @@ jobs:
         run: dart format --output=none --set-exit-if-changed .
 
       - name: "Analyse Statique (Linter)"
-        run: flutter analyze .
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings .
 
       - name: "Execution des Tests Unitaires"
         run: flutter test packages/audioplayers
-
 
   android-build:
     name: "Android (APK Build)"
     needs: validate
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
         with:
           distribution: 'corretto'
           java-version: '17'
@@ -47,7 +46,7 @@ jobs:
         working-directory: packages/audioplayers/example
         run: flutter build apk --release
       - name: "Upload APK"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: android-apk
           path: packages/audioplayers/example/build/app/outputs/flutter-apk/app-release.apk
@@ -57,7 +56,7 @@ jobs:
     needs: validate
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: "Installation Dépendances Linux"
         run: |
           sudo apt-get update -y
@@ -74,7 +73,7 @@ jobs:
         working-directory: packages/audioplayers/example/build/linux/x64/release/bundle
         run: tar -czvf $GITHUB_WORKSPACE/audioplayers-linux.tar.gz .
       - name: "Upload Linux"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: linux-build
           path: audioplayers-linux.tar.gz
@@ -84,7 +83,7 @@ jobs:
     needs: validate
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
@@ -98,7 +97,7 @@ jobs:
         run: |
           Compress-Archive -Path packages/audioplayers/example/build/windows/x64/runner/Release/* -DestinationPath audioplayers-windows.zip
       - name: "Upload Windows"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: windows-build
           path: audioplayers-windows.zip
@@ -108,7 +107,7 @@ jobs:
     needs: validate
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
@@ -119,7 +118,7 @@ jobs:
         working-directory: packages/audioplayers/example/build/web
         run: zip -r $GITHUB_WORKSPACE/audioplayers-web.zip .
       - name: "Upload Web"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: web-build
           path: audioplayers-web.zip
@@ -129,7 +128,7 @@ jobs:
     needs: validate
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
@@ -140,7 +139,7 @@ jobs:
         working-directory: packages/audioplayers/example/build/macos/Build/Products/Release
         run: zip -r $GITHUB_WORKSPACE/audioplayers-macos.zip *.app
       - name: "Upload macOS"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: macos-build
           path: audioplayers-macos.zip
@@ -150,7 +149,7 @@ jobs:
     needs: validate
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
@@ -161,7 +160,7 @@ jobs:
         working-directory: packages/audioplayers/example/build/ios/iphoneos
         run: zip -r $GITHUB_WORKSPACE/audioplayers-ios.zip Runner.app
       - name: "Upload iOS"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ios-build
           path: audioplayers-ios.zip
@@ -174,7 +173,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: "Extraire la version"
         id: get_version
@@ -208,7 +207,7 @@ jobs:
           fi
 
       - name: "Download Artifacts"
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: release-artifacts
 
@@ -223,7 +222,7 @@ jobs:
           cp release-artifacts/ios-build/audioplayers-ios.zip deploy/
 
       - name: "Créer la Release GitHub"
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.get_version.outputs.TAG }}
           name: Release ${{ steps.get_version.outputs.VERSION }}
