@@ -439,7 +439,7 @@ class _SourceDialogState extends State<_SourceDialog> {
             Expanded(child: Text(path)),
             TextButton.icon(
               onPressed: () async {
-                final result = await FilePicker.platform.pickFiles();
+                final result = await FilePicker.pickFiles();
                 final path = result?.files.single.path;
                 if (path != null) {
                   setState(() {
