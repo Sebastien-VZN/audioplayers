@@ -1,0 +1,34 @@
+name: Purge Artifacts
+
+on:
+  workflow_dispatch:
+
+jobs:
+  purge:
+    name: "Supprimer tous les artifacts"
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: "Purger"
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const artifacts = await github.paginate(
+              github.rest.actions.listArtifactsForRepo, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                per_page: 100
+              }
+            );
+            let count = 0;
+            for (const artifact of artifacts) {
+              console.log(`Deleting: ${artifact.name} (#${artifact.id})`);
+              await github.rest.actions.deleteArtifact({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                artifact_id: artifact.id
+              });
+              count++;
+            }
+            console.log(`Deleted ${count} artifacts.`);
