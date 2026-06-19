@@ -127,7 +127,7 @@ void AudioplayersWindowsPlugin::HandleGlobalMethodCall(
   } else if (method_call.method_name().compare("emitError") == 0) {
     auto code = GetArgument<std::string>("code", args, std::string());
     auto message = GetArgument<std::string>("message", args, std::string());
-    globalEvents->Error(code, message, nullptr);
+    globalEvents->Error(code, message);
     result->Success();
   } else {
     result->NotImplemented();
@@ -148,7 +148,7 @@ void AudioplayersWindowsPlugin::HandleMethodCall(
   auto playerId = GetArgument<std::string>("playerId", args, std::string());
   if (playerId.empty()) {
     result->Error("WindowsAudioError",
-                  "Call missing mandatory parameter playerId.", nullptr);
+                  "Call missing mandatory parameter playerId.");
     return;
   }
 
@@ -162,8 +162,7 @@ void AudioplayersWindowsPlugin::HandleMethodCall(
   if (!player) {
     result->Error(
         "WindowsAudioError",
-        "Player has not yet been created or has already been disposed.",
-        nullptr);
+        "Player has not yet been created or has already been disposed.");
     return;
   }
 
@@ -183,8 +182,7 @@ void AudioplayersWindowsPlugin::HandleMethodCall(
     auto url = GetArgument<std::string>("url", args, std::string());
 
     if (url.empty()) {
-      result->Error("WindowsAudioError", "Null URL received on setSourceUrl",
-                    nullptr);
+      result->Error("WindowsAudioError", "Null URL received on setSourceUrl");
       return;
     }
 
@@ -197,7 +195,7 @@ void AudioplayersWindowsPlugin::HandleMethodCall(
 
     if (data.empty()) {
       result->Error("WindowsAudioError",
-                    "Null bytes received on setSourceBytes", nullptr);
+                    "Null bytes received on setSourceBytes");
       return;
     }
 
@@ -227,8 +225,7 @@ void AudioplayersWindowsPlugin::HandleMethodCall(
         GetArgument<std::string>("releaseMode", args, std::string());
     if (releaseModeStr.empty()) {
       result->Error("WindowsAudioError",
-                    "Error calling setReleaseMode, releaseMode cannot be null",
-                    nullptr);
+                    "Error calling setReleaseMode, releaseMode cannot be null");
       return;
     }
     auto releaseModeIt = releaseModeMap.find(releaseModeStr);
@@ -237,8 +234,7 @@ void AudioplayersWindowsPlugin::HandleMethodCall(
     } else {
       result->Error("WindowsAudioError",
                     "Error calling setReleaseMode, releaseMode '" +
-                        releaseModeStr + "' not known",
-                    nullptr);
+                        releaseModeStr + "' not known");
       return;
     }
   } else if (method_call.method_name().compare("setPlayerMode") == 0) {
@@ -254,7 +250,7 @@ void AudioplayersWindowsPlugin::HandleMethodCall(
   } else if (method_call.method_name().compare("emitError") == 0) {
     auto code = GetArgument<std::string>("code", args, std::string());
     auto message = GetArgument<std::string>("message", args, std::string());
-    player->OnError(code, message, nullptr);
+    player->OnError(code, message);
   } else if (method_call.method_name().compare("dispose") == 0) {
     player->Dispose();
     audioPlayers.erase(playerId);
