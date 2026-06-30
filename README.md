@@ -9,8 +9,8 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-6.7.1-blueviolet?style=flat-square&logo=github" alt="Version"/>
-  <img src="https://img.shields.io/badge/Release%20Date-2026--06--18-blue?style=flat-square&logo=calendar" alt="Release Date"/>
+  <img src="https://img.shields.io/badge/Version-6.7.2-blueviolet?style=flat-square&logo=github" alt="Version"/>
+  <img src="https://img.shields.io/badge/Release%20Date-2026--06--19-blue?style=flat-square&logo=calendar" alt="Release Date"/>
 </p>
 
 [![Build Check](https://github.com/Sebastien-VZN/audioplayers/actions/workflows/build_check.yml/badge.svg)](https://github.com/Sebastien-VZN/audioplayers/actions/workflows/build_check.yml)
