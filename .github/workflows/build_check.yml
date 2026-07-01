@@ -44,7 +44,7 @@ jobs:
         shell: cmd
         run: |
           cd packages\audioplayers_windows\windows
-          cl /EHsc /std:c++23 /I . /I include /I ..\..\audioplayers_windows\windows test_no_audio_device.cpp /link ole32.lib /Fe:test_no_audio_device.exe
+          cl /EHsc /std:c++latest test_no_audio_device.cpp /link ole32.lib /Fe:test_no_audio_device.exe
           .\test_no_audio_device.exe
 
   android-build:
