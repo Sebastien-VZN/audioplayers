@@ -229,7 +229,14 @@ class AudioPlayer {
       await seek(position);
     }
 
-    await _resume();
+    try {
+      await _resume();
+    } on Exception catch (e, stackTrace) {
+      // Log the error but don't rethrow to prevent app crash.
+      // Same pattern as _completePrepared: resume() can fail when no audio
+      // device is available (MediaSink creation failed).
+      AudioLogger.error(AudioPlayerException(this, cause: e), stackTrace);
+    }
   }
 
   Future<void> setAudioContext(AudioContext ctx) async {
