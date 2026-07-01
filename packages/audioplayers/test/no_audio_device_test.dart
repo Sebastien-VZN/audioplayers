@@ -47,6 +47,11 @@ void main() {
   late StreamController<AudioEvent> eventController;
 
   setUp(() {
+    // Désactiver les logs globalement pour éviter que AudioLogger.error →
+    // debugPrint soit intercepté par le framework de test comme une erreur
+    // non gérée pendant les tests d'erreur.
+    AudioLogger.logLevel = AudioLogLevel.none;
+
     mockPlatform = MockAudioplayersPlatform();
     AudioplayersPlatformInterface.instance = mockPlatform;
 
@@ -59,13 +64,15 @@ void main() {
 
     // Stubbing global platform
     when(() => mockGlobalPlatform.init()).thenAnswer((_) async {});
-    when(() => mockGlobalPlatform.getGlobalEventStream())
-        .thenAnswer((_) => const Stream<GlobalAudioEvent>.empty());
+    when(
+      () => mockGlobalPlatform.getGlobalEventStream(),
+    ).thenAnswer((_) => const Stream<GlobalAudioEvent>.empty());
 
     // Stubbing player platform basic methods
     when(() => mockPlatform.create(any())).thenAnswer((_) async {});
-    when(() => mockPlatform.getEventStream(any()))
-        .thenAnswer((_) => eventController.stream);
+    when(
+      () => mockPlatform.getEventStream(any()),
+    ).thenAnswer((_) => eventController.stream);
     when(() => mockPlatform.dispose(any())).thenAnswer((_) async {});
     when(
       () => mockPlatform.setSourceUrl(
@@ -89,10 +96,12 @@ void main() {
     when(() => mockPlatform.seek(any(), any())).thenAnswer((_) async {});
     when(() => mockPlatform.setVolume(any(), any())).thenAnswer((_) async {});
     when(() => mockPlatform.setBalance(any(), any())).thenAnswer((_) async {});
-    when(() => mockPlatform.setPlaybackRate(any(), any()))
-        .thenAnswer((_) async {});
-    when(() => mockPlatform.getCurrentPosition(any()))
-        .thenAnswer((_) async => 0);
+    when(
+      () => mockPlatform.setPlaybackRate(any(), any()),
+    ).thenAnswer((_) async {});
+    when(
+      () => mockPlatform.getCurrentPosition(any()),
+    ).thenAnswer((_) async => 0);
     when(() => mockPlatform.getDuration(any())).thenAnswer((_) async => 0);
   });
 
@@ -101,35 +110,42 @@ void main() {
   });
 
   group('Issue #1979 — No audio device (creation failure)', () {
-    test('Player creation with PlatformException does not crash the app',
-        () async {
-      // Simule l'échec de création du player côté natif (pas de device audio).
-      // Le code C++ lance result->Error("WindowsAudioError", ...) qui remonte
-      // comme PlatformException côté Dart.
-      when(() => mockPlatform.create(any())).thenThrow(
-        PlatformException(
-          code: 'WindowsAudioError',
-          message: 'Failed to create audio player.',
-          details: 'MediaEngine creation failed (no audio device).',
-        ),
-      );
+    test(
+      'Player creation with PlatformException does not crash the app',
+      () async {
+        // Simule l'échec de création du player côté natif (pas de device audio).
+        // Le code C++ lance result->Error("WindowsAudioError", ...) qui remonte
+        // comme PlatformException côté Dart.
+        when(() => mockPlatform.create(any())).thenThrow(
+          PlatformException(
+            code: 'WindowsAudioError',
+            message: 'Failed to create audio player.',
+            details: 'MediaEngine creation failed (no audio device).',
+          ),
+        );
 
-      final player = AudioPlayer()..audioCache = mockCache;
+        final player = AudioPlayer()..audioCache = mockCache;
 
-      // _create() catch Exception → creatingCompleter.completeError.
-      // L'erreur doit être captée, pas propagée comme crash non géré.
-      expect(
-        player.creatingCompleter.future,
-        throwsA(isA<PlatformException>()
-            .having((e) => e.code, 'code', 'WindowsAudioError')),
-      );
+        // _create() catch Exception → creatingCompleter.completeError.
+        // L'erreur doit être captée, pas propagée comme crash non géré.
+        expect(
+          player.creatingCompleter.future,
+          throwsA(
+            isA<PlatformException>().having(
+              (e) => e.code,
+              'code',
+              'WindowsAudioError',
+            ),
+          ),
+        );
 
-      // Le player ne doit pas crasher — il reste dans l'état initial.
-      await expectLater(
-        player.creatingCompleter.future,
-        throwsA(isA<PlatformException>()),
-      );
-    });
+        // Le player ne doit pas crasher — il reste dans l'état initial.
+        await expectLater(
+          player.creatingCompleter.future,
+          throwsA(isA<PlatformException>()),
+        );
+      },
+    );
 
     test('play() after creation failure logs error without crashing', () async {
       when(() => mockPlatform.create(any())).thenThrow(
@@ -176,45 +192,53 @@ void main() {
       // En production, l'appelant (play() ou _completePrepared) catch l'erreur.
       expect(
         player.resume(),
-        throwsA(isA<PlatformException>()
-            .having((e) => e.code, 'code', 'WindowsAudioError')),
+        throwsA(
+          isA<PlatformException>().having(
+            (e) => e.code,
+            'code',
+            'WindowsAudioError',
+          ),
+        ),
       );
     });
 
-    test('play() catches PlatformException on resume and logs via AudioLogger',
-        () async {
-      final player = AudioPlayer()..audioCache = mockCache;
-      await player.creatingCompleter.future;
+    test(
+      'play() catches PlatformException on resume and logs via AudioLogger',
+      () async {
+        final player = AudioPlayer()..audioCache = mockCache;
+        await player.creatingCompleter.future;
 
-      // setSourceUrl réussit, mais resume échoue.
-      when(() => mockPlatform.resume(any())).thenThrow(
-        PlatformException(
-          code: 'WindowsAudioError',
-          message: 'Playback error',
-          details: 'Échec de la création de mediasink (Code: 4)',
-        ),
-      );
+        // setSourceUrl réussit, mais resume échoue.
+        when(() => mockPlatform.resume(any())).thenThrow(
+          PlatformException(
+            code: 'WindowsAudioError',
+            message: 'Playback error',
+            details: 'Échec de la création de mediasink (Code: 4)',
+          ),
+        );
 
-      // play() appelle _completePrepared qui a un try-catch (ligne 388).
-      // L'erreur doit être captée par AudioLogger.error, pas propagée.
-      final playFuture =
-          player.play(UrlSource('https://example.com/audio.mp3'));
+        // play() appelle _completePrepared qui a un try-catch (ligne 388).
+        // L'erreur doit être captée par AudioLogger.error, pas propagée.
+        final playFuture = player.play(
+          UrlSource('https://example.com/audio.mp3'),
+        );
 
-      // Simuler l'événement prepared pour débloquer le Future.wait.
-      await Future<void>.delayed(const Duration(milliseconds: 100));
-      eventController.add(
-        const AudioEvent(
-          eventType: AudioEventType.prepared,
-          isPrepared: true,
-        ),
-      );
+        // Simuler l'événement prepared pour débloquer le Future.wait.
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+        eventController.add(
+          const AudioEvent(
+            eventType: AudioEventType.prepared,
+            isPrepared: true,
+          ),
+        );
 
-      // play() doit compléter sans crasher (erreur captée en interne).
-      await playFuture;
+        // play() doit compléter sans crasher (erreur captée en interne).
+        await playFuture;
 
-      // Le player doit toujours être utilisable.
-      expect(player.state, isNot(PlayerState.disposed));
-    });
+        // Le player doit toujours être utilisable.
+        expect(player.state, isNot(PlayerState.disposed));
+      },
+    );
 
     test('BytesSource playback failure does not crash', () async {
       final player = AudioPlayer()..audioCache = mockCache;
@@ -229,15 +253,13 @@ void main() {
       );
 
       final bytes = Uint8List.fromList([0, 1, 2, 3, 4, 5, 6, 7]);
-      final playFuture =
-          player.play(BytesSource(bytes, mimeType: 'audio/mpeg'));
+      final playFuture = player.play(
+        BytesSource(bytes, mimeType: 'audio/mpeg'),
+      );
 
       await Future<void>.delayed(const Duration(milliseconds: 100));
       eventController.add(
-        const AudioEvent(
-          eventType: AudioEventType.prepared,
-          isPrepared: true,
-        ),
+        const AudioEvent(eventType: AudioEventType.prepared, isPrepared: true),
       );
 
       // Doit compléter sans crasher.
