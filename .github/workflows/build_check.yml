@@ -29,6 +29,24 @@ jobs:
       - name: "Execution des Tests Unitaires"
         run: flutter test packages/audioplayers
 
+  windows-native-test:
+    name: "Tests C++ Natifs Windows (Issue #1979)"
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: "Setup Developer Command Prompt"
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: "Compiler et executer les tests C++"
+        shell: cmd
+        run: |
+          cd packages\audioplayers_windows\windows
+          cl /EHsc /std:c++23 /I . /I include /I ..\..\audioplayers_windows\windows test_no_audio_device.cpp /link ole32.lib /Fe:test_no_audio_device.exe
+          .\test_no_audio_device.exe
+
   android-build:
     name: "Android (APK Build)"
     needs: validate
@@ -201,7 +219,7 @@ jobs:
 
   release:
     name: "Création de la Release GitHub"
-    needs: [android-build, linux-build, windows-build, web-build, macos-build, ios-build]
+    needs: [android-build, linux-build, windows-build, web-build, macos-build, ios-build, windows-native-test]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:

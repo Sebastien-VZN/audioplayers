@@ -27,23 +27,34 @@ AudioPlayer::AudioPlayer(
       _methodChannel(methodChannel),
       _eventChannel(std::move(eventChannel)),
       _eventHandler(eventHandler) {
-  m_mfPlatform.Startup();
+  try {
+    m_mfPlatform.Startup();
 
-  // Callbacks invoked by the media engine wrapper
-  auto onError = std::bind(&AudioPlayer::OnMediaError, this,
-                           std::placeholders::_1, std::placeholders::_2);
-  auto onBufferingStateChanged =
-      std::bind(&AudioPlayer::OnMediaStateChange, this, std::placeholders::_1);
-  auto onPlaybackEndedCB = std::bind(&AudioPlayer::OnPlaybackEnded, this);
-  auto onSeekCompletedCB = std::bind(&AudioPlayer::OnSeekCompleted, this);
-  auto onLoadedCB = std::bind(&AudioPlayer::SendInitialized, this);
+    // Callbacks invoked by the media engine wrapper
+    auto onError = std::bind(&AudioPlayer::OnMediaError, this,
+                             std::placeholders::_1, std::placeholders::_2);
+    auto onBufferingStateChanged =
+        std::bind(&AudioPlayer::OnMediaStateChange, this, std::placeholders::_1);
+    auto onPlaybackEndedCB = std::bind(&AudioPlayer::OnPlaybackEnded, this);
+    auto onSeekCompletedCB = std::bind(&AudioPlayer::OnSeekCompleted, this);
+    auto onLoadedCB = std::bind(&AudioPlayer::SendInitialized, this);
 
-  // Create and initialize the MediaEngineWrapper which manages media playback
-  m_mediaEngineWrapper = winrt::make_self<media::MediaEngineWrapper>(
-      onLoadedCB, onError, onBufferingStateChanged, onPlaybackEndedCB,
-      onSeekCompletedCB);
+    // Create and initialize the MediaEngineWrapper which manages media playback
+    m_mediaEngineWrapper = winrt::make_self<media::MediaEngineWrapper>(
+        onLoadedCB, onError, onBufferingStateChanged, onPlaybackEndedCB,
+        onSeekCompletedCB);
 
-  m_mediaEngineWrapper->Initialize();
+    m_mediaEngineWrapper->Initialize();
+  } catch (const std::exception& ex) {
+    OutputDebugStringA("[audioplayers_windows] AudioPlayer creation failed: ");
+    OutputDebugStringA(ex.what());
+    OutputDebugStringA("\n");
+    throw;  // Remonte vers HandleMethodCall qui renvoie result->Error a Flutter
+  } catch (...) {
+    OutputDebugStringA("[audioplayers_windows] AudioPlayer creation failed: "
+                       "unknown error (no audio device available?)\n");
+    throw;  // Remonte vers HandleMethodCall qui renvoie result->Error a Flutter
+  }
 }
 
 AudioPlayer::~AudioPlayer() {}
@@ -108,12 +119,16 @@ void AudioPlayer::SetSourceBytes(std::vector<uint8_t> bytes) {
     IStream* pstm =
         SHCreateMemStream(bytes.data(), static_cast<unsigned int>(size));
     IMFByteStream* stream = NULL;
-    MFCreateMFByteStreamOnStream(pstm, &stream);
+    THROW_IF_FAILED(MFCreateMFByteStreamOnStream(pstm, &stream));
 
-    sourceResolver->CreateObjectFromByteStream(
+    THROW_IF_FAILED(sourceResolver->CreateObjectFromByteStream(
         stream, nullptr, sourceResolutionFlags, nullptr, &objectType,
-        reinterpret_cast<IUnknown**>(mediaSource.put_void()));
+        reinterpret_cast<IUnknown**>(mediaSource.put_void())));
     m_mediaEngineWrapper->SetMediaSource(mediaSource.get());
+  } catch (const std::exception& ex) {
+    this->OnError("WindowsAudioError",
+                  "Error setting bytes",
+                  flutter::EncodableValue(ex.what()));
   } catch (...) {
     // Forward errors to event stream, as this is called asynchronously
     this->OnError("WindowsAudioError", "Error setting bytes");

@@ -120,11 +120,19 @@ inline void RunSyncInMTA(std::function<void()> callback) {
   } else {
     wil::unique_event complete;
     complete.create();
+    std::exception_ptr capturedException;
     MFPutWorkItem([&]() {
-      callback();
-      complete.SetEvent();
+      try {
+        callback();
+      } catch (...) {
+        capturedException = std::current_exception();
+      }
+      complete.SetEvent();  // Toujours signer, meme en cas d'erreur
     });
     complete.wait();
+    if (capturedException) {
+      std::rethrow_exception(capturedException);  // Relance sur le thread appelant
+    }
   }
 }
 

@@ -143,125 +143,138 @@ void AudioplayersWindowsPlugin::HandleMethodCall(
   // IMPORTANT: Process pending events FIRST to deliver async callbacks
   PlatformThreadHelper::GetInstance().ProcessPendingTasks();
 
-  auto args = method_call.arguments();
+  try {
+    auto args = method_call.arguments();
 
-  auto playerId = GetArgument<std::string>("playerId", args, std::string());
-  if (playerId.empty()) {
-    result->Error("WindowsAudioError",
-                  "Call missing mandatory parameter playerId.");
-    return;
-  }
-
-  if (method_call.method_name().compare("create") == 0) {
-    CreatePlayer(playerId);
-    result->Success();
-    return;
-  }
-
-  auto player = GetPlayer(playerId);
-  if (!player) {
-    result->Error(
-        "WindowsAudioError",
-        "Player has not yet been created or has already been disposed.");
-    return;
-  }
-
-  if (method_call.method_name().compare("pause") == 0) {
-    player->Pause();
-  } else if (method_call.method_name().compare("resume") == 0) {
-    player->Resume();
-  } else if (method_call.method_name().compare("stop") == 0) {
-    player->Stop();
-  } else if (method_call.method_name().compare("release") == 0) {
-    player->ReleaseMediaSource();
-  } else if (method_call.method_name().compare("seek") == 0) {
-    auto positionInMs = GetArgument<int>(
-        "position", args, (int)ConvertSecondsToMs(player->GetPosition()));
-    player->SeekTo(ConvertMsToSeconds(positionInMs));
-  } else if (method_call.method_name().compare("setSourceUrl") == 0) {
-    auto url = GetArgument<std::string>("url", args, std::string());
-
-    if (url.empty()) {
-      result->Error("WindowsAudioError", "Null URL received on setSourceUrl");
-      return;
-    }
-
-    // SetSourceUrl handles async loading internally via MediaFoundation
-    // Callbacks will fire asynchronously without needing std::thread
-    player->SetSourceUrl(url);
-  } else if (method_call.method_name().compare("setSourceBytes") == 0) {
-    auto data = GetArgument<std::vector<uint8_t>>("bytes", args,
-                                                  std::vector<uint8_t>{});
-
-    if (data.empty()) {
+    auto playerId = GetArgument<std::string>("playerId", args, std::string());
+    if (playerId.empty()) {
       result->Error("WindowsAudioError",
-                    "Null bytes received on setSourceBytes");
+                    "Call missing mandatory parameter playerId.");
       return;
     }
 
-    // SetSourceBytes handles async loading internally via MediaFoundation
-    // Callbacks will fire asynchronously without needing std::thread
-    player->SetSourceBytes(data);
-  } else if (method_call.method_name().compare("getDuration") == 0) {
-    auto duration = player->GetDuration();
-    result->Success(isnan(duration)
-                        ? EncodableValue(std::monostate{})
-                        : EncodableValue(ConvertSecondsToMs(duration)));
-    return;
-  } else if (method_call.method_name().compare("setVolume") == 0) {
-    auto volume = GetArgument<double>("volume", args, 1.0);
-    player->SetVolume(volume);
-  } else if (method_call.method_name().compare("getCurrentPosition") == 0) {
-    auto position = player->GetPosition();
-    result->Success(isnan(position)
-                        ? EncodableValue(std::monostate{})
-                        : EncodableValue(ConvertSecondsToMs(position)));
-    return;
-  } else if (method_call.method_name().compare("setPlaybackRate") == 0) {
-    auto playbackRate = GetArgument<double>("playbackRate", args, 1.0);
-    player->SetPlaybackSpeed(playbackRate);
-  } else if (method_call.method_name().compare("setReleaseMode") == 0) {
-    auto releaseModeStr =
-        GetArgument<std::string>("releaseMode", args, std::string());
-    if (releaseModeStr.empty()) {
-      result->Error("WindowsAudioError",
-                    "Error calling setReleaseMode, releaseMode cannot be null");
+    if (method_call.method_name().compare("create") == 0) {
+      CreatePlayer(playerId);
+      result->Success();
       return;
     }
-    auto releaseModeIt = releaseModeMap.find(releaseModeStr);
-    if (releaseModeIt != releaseModeMap.end()) {
-      player->SetReleaseMode(releaseModeIt->second);
+
+    auto player = GetPlayer(playerId);
+    if (!player) {
+      result->Error(
+          "WindowsAudioError",
+          "Player has not yet been created or has already been disposed.");
+      return;
+    }
+
+    if (method_call.method_name().compare("pause") == 0) {
+      player->Pause();
+    } else if (method_call.method_name().compare("resume") == 0) {
+      player->Resume();
+    } else if (method_call.method_name().compare("stop") == 0) {
+      player->Stop();
+    } else if (method_call.method_name().compare("release") == 0) {
+      player->ReleaseMediaSource();
+    } else if (method_call.method_name().compare("seek") == 0) {
+      auto positionInMs = GetArgument<int>(
+          "position", args, (int)ConvertSecondsToMs(player->GetPosition()));
+      player->SeekTo(ConvertMsToSeconds(positionInMs));
+    } else if (method_call.method_name().compare("setSourceUrl") == 0) {
+      auto url = GetArgument<std::string>("url", args, std::string());
+
+      if (url.empty()) {
+        result->Error("WindowsAudioError", "Null URL received on setSourceUrl");
+        return;
+      }
+
+      // SetSourceUrl handles async loading internally via MediaFoundation
+      // Callbacks will fire asynchronously without needing std::thread
+      player->SetSourceUrl(url);
+    } else if (method_call.method_name().compare("setSourceBytes") == 0) {
+      auto data = GetArgument<std::vector<uint8_t>>("bytes", args,
+                                                    std::vector<uint8_t>{});
+
+      if (data.empty()) {
+        result->Error("WindowsAudioError",
+                      "Null bytes received on setSourceBytes");
+        return;
+      }
+
+      // SetSourceBytes handles async loading internally via MediaFoundation
+      // Callbacks will fire asynchronously without needing std::thread
+      player->SetSourceBytes(data);
+    } else if (method_call.method_name().compare("getDuration") == 0) {
+      auto duration = player->GetDuration();
+      result->Success(isnan(duration)
+                          ? EncodableValue(std::monostate{})
+                          : EncodableValue(ConvertSecondsToMs(duration)));
+      return;
+    } else if (method_call.method_name().compare("setVolume") == 0) {
+      auto volume = GetArgument<double>("volume", args, 1.0);
+      player->SetVolume(volume);
+    } else if (method_call.method_name().compare("getCurrentPosition") == 0) {
+      auto position = player->GetPosition();
+      result->Success(isnan(position)
+                          ? EncodableValue(std::monostate{})
+                          : EncodableValue(ConvertSecondsToMs(position)));
+      return;
+    } else if (method_call.method_name().compare("setPlaybackRate") == 0) {
+      auto playbackRate = GetArgument<double>("playbackRate", args, 1.0);
+      player->SetPlaybackSpeed(playbackRate);
+    } else if (method_call.method_name().compare("setReleaseMode") == 0) {
+      auto releaseModeStr =
+          GetArgument<std::string>("releaseMode", args, std::string());
+      if (releaseModeStr.empty()) {
+        result->Error("WindowsAudioError",
+                      "Error calling setReleaseMode, releaseMode cannot be null");
+        return;
+      }
+      auto releaseModeIt = releaseModeMap.find(releaseModeStr);
+      if (releaseModeIt != releaseModeMap.end()) {
+        player->SetReleaseMode(releaseModeIt->second);
+      } else {
+        result->Error("WindowsAudioError",
+                      "Error calling setReleaseMode, releaseMode '" +
+                          releaseModeStr + "' not known");
+        return;
+      }
+    } else if (method_call.method_name().compare("setPlayerMode") == 0) {
+      // windows doesn't have multiple player modes, so this should no-op
+    } else if (method_call.method_name().compare("setAudioContext") == 0) {
+      player->OnLog("Setting AudioContext is not supported on Windows");
+    } else if (method_call.method_name().compare("setBalance") == 0) {
+      auto balance = GetArgument<double>("balance", args, 0.0);
+      player->SetBalance(balance);
+    } else if (method_call.method_name().compare("emitLog") == 0) {
+      auto message = GetArgument<std::string>("message", args, std::string());
+      player->OnLog(message);
+    } else if (method_call.method_name().compare("emitError") == 0) {
+      auto code = GetArgument<std::string>("code", args, std::string());
+      auto message = GetArgument<std::string>("message", args, std::string());
+      player->OnError(code, message);
+    } else if (method_call.method_name().compare("dispose") == 0) {
+      player->Dispose();
+      audioPlayers.erase(playerId);
     } else {
-      result->Error("WindowsAudioError",
-                    "Error calling setReleaseMode, releaseMode '" +
-                        releaseModeStr + "' not known");
+      result->NotImplemented();
       return;
     }
-  } else if (method_call.method_name().compare("setPlayerMode") == 0) {
-    // windows doesn't have multiple player modes, so this should no-op
-  } else if (method_call.method_name().compare("setAudioContext") == 0) {
-    player->OnLog("Setting AudioContext is not supported on Windows");
-  } else if (method_call.method_name().compare("setBalance") == 0) {
-    auto balance = GetArgument<double>("balance", args, 0.0);
-    player->SetBalance(balance);
-  } else if (method_call.method_name().compare("emitLog") == 0) {
-    auto message = GetArgument<std::string>("message", args, std::string());
-    player->OnLog(message);
-  } else if (method_call.method_name().compare("emitError") == 0) {
-    auto code = GetArgument<std::string>("code", args, std::string());
-    auto message = GetArgument<std::string>("message", args, std::string());
-    player->OnError(code, message);
-  } else if (method_call.method_name().compare("dispose") == 0) {
-    player->Dispose();
-    audioPlayers.erase(playerId);
-  } else {
-    result->NotImplemented();
-    return;
-  }
 
-  // Process events again after the operation completes
-  PlatformThreadHelper::GetInstance().ProcessPendingTasks();
-  result->Success();
+    // Process events again after the operation completes
+    PlatformThreadHelper::GetInstance().ProcessPendingTasks();
+    result->Success();
+  } catch (const std::exception& ex) {
+    OutputDebugStringA("[audioplayers_windows] HandleMethodCall error: ");
+    OutputDebugStringA(ex.what());
+    OutputDebugStringA("\n");
+    result->Error("WindowsAudioError",
+                  "Audio player error.",
+                  flutter::EncodableValue(ex.what()));
+  } catch (...) {
+    OutputDebugStringA("[audioplayers_windows] HandleMethodCall unknown error\n");
+    result->Error("WindowsAudioError",
+                  "Unknown AudioPlayersWindows error.");
+  }
 }
 
 void AudioplayersWindowsPlugin::CreatePlayer(std::string playerId) {
@@ -278,7 +291,7 @@ void AudioplayersWindowsPlugin::CreatePlayer(std::string playerId) {
   auto player =
       std::make_unique<AudioPlayer>(playerId, methods.get(), std::move(eventChannel), eventHandler);
   audioPlayers.insert(std::make_pair(playerId, std::move(player)));
-  
+
   // Process any pending events from MediaEngine initialization
   PlatformThreadHelper::GetInstance().ProcessPendingTasks();
 }
