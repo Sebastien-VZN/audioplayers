@@ -1,5 +1,6 @@
 {
   "files.eol": "\n",
   "files.trimTrailingWhitespace": true,
-  "files.insertFinalNewline": true
+  "files.insertFinalNewline": true,
+  "cmake.sourceDirectory": "C:/Devs/01_client_project/audioplayers_stable/packages/audioplayers_linux/linux"
 }
