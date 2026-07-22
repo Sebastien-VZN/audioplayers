@@ -6,7 +6,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:pub_semver/pub_semver.dart';
 
 import 'lib/lib_source_test_data.dart';
 import 'platform_features.dart';
@@ -20,15 +19,10 @@ final isAndroid = !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
 
 bool canDetermineDuration(SourceTestData td) {
   // TODO(gustl22): cannot determine duration for VBR on Linux
-  // FIXME(gustl22): duration event is not emitted for short duration
-  // WAV on Linux (only platform tests, may be a race condition).
   if (td.duration == null) {
     return true;
   }
-  if (isLinux) {
-    return !(td.isVBR || td.duration! < const Duration(seconds: 5));
-  }
-  return true;
+  return !isLinux || !td.isVBR;
 }
 
 void main() async {
@@ -69,16 +63,6 @@ void main() async {
             testData: invalidAssetTestData,
           ),
         );
-
-        // TODO(gustl22): remove when min supported Flutter version is 3.41.0
-        if (isLinux &&
-            FlutterVersion.version != null &&
-            Version.parse(FlutterVersion.version!) < Version.parse('3.41.0')) {
-          // Flutter throws a second failure event for invalid files on Linux.
-          // If not caught, it would be randomly thrown in the following tests.
-          final nextEvent = platform.getEventStream(playerId).first;
-          await tester.expectSettingSourceFailure(future: nextEvent);
-        }
       },
     );
 
@@ -147,9 +131,7 @@ void main() async {
             ),
           );
         },
-        // FIXME(gustl22): determines wrong initial position for m3u8 on Linux
-        skip: !canDetermineDuration(td) ||
-            isLinux && td.source == m3u8UrlTestData.source,
+        skip: !canDetermineDuration(td),
       );
     }
 

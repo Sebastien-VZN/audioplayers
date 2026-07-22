@@ -123,6 +123,13 @@ gboolean AudioPlayer::OnBusMessage(GstBus* bus,
       if (!data->_isSeekCompleted) {
         data->OnSeekCompleted();
         data->_isSeekCompleted = true;
+        break;
+      }
+
+      if (!data->_isInitialized) {
+        data->_isInitialized = true;
+        data->OnDurationUpdate();
+        data->OnPrepared(true);
       }
       break;
     default:
@@ -181,34 +188,30 @@ void AudioPlayer::OnMediaStateChange(GstObject* src,
   }
 
   if (src == GST_OBJECT(playbin)) {
-    if (*new_state == GST_STATE_READY) {
-      // Need to set to pause state, in order to make player functional
-      GstStateChangeReturn ret =
-          gst_element_set_state(playbin, GST_STATE_PAUSED);
-      if (ret == GST_STATE_CHANGE_FAILURE) {
-        // Only use [OnLog] as error is handled via [OnMediaError].
-        gchar const* errorDescription =
-            "OnMediaStateChange -> GST_STATE_CHANGE_FAILURE:"
-            "Unable to set the pipeline from GST_STATE_READY to "
-            "GST_STATE_PAUSED.";
-        this->OnLog(errorDescription);
+    if (*new_state < GST_STATE_PAUSED) {
+      if (*new_state == GST_STATE_READY) {
+        // Need to set to pause state, in order to make player functional
+        GstStateChangeReturn ret =
+            gst_element_set_state(playbin, GST_STATE_PAUSED);
+        if (ret == GST_STATE_CHANGE_FAILURE) {
+          // Only use [OnLog] as error is handled via [OnMediaError].
+          gchar const* errorDescription =
+              "OnMediaStateChange -> GST_STATE_CHANGE_FAILURE:"
+              "Unable to set the pipeline from GST_STATE_READY to "
+              "GST_STATE_PAUSED.";
+          this->OnLog(errorDescription);
+        }
       }
       if (this->_isInitialized) {
         this->_isInitialized = false;
       }
-    } else if (*old_state == GST_STATE_PAUSED &&
-               *new_state == GST_STATE_PLAYING) {
-      OnDurationUpdate();
-    } else if (*new_state >= GST_STATE_PAUSED) {
-      if (!this->_isInitialized) {
-        this->_isInitialized = true;
-        this->OnPrepared(true);
-        if (this->_isPlaying) {
-          Resume();
-        }
+    } else {
+      if (*old_state == GST_STATE_PAUSED && *new_state == GST_STATE_PLAYING) {
+        OnPlayingStateUpdate(true);
+      } else if (*old_state == GST_STATE_PLAYING &&
+                 *new_state == GST_STATE_PAUSED) {
+        OnPlayingStateUpdate(false);
       }
-    } else if (this->_isInitialized) {
-      this->_isInitialized = false;
     }
   }
 }
@@ -238,6 +241,16 @@ void AudioPlayer::OnSeekCompleted() {
     fl_value_set_string(map, "event",
                         fl_value_new_string("audio.onSeekComplete"));
     fl_value_set_string(map, "value", fl_value_new_bool(true));
+    fl_event_channel_send(this->_eventChannel, map, nullptr, nullptr);
+  }
+}
+
+void AudioPlayer::OnPlayingStateUpdate(bool isPlaying) {
+  if (this->_eventChannel) {
+    g_autoptr(FlValue) map = fl_value_new_map();
+    fl_value_set_string(map, "event",
+                        fl_value_new_string("audio.onPlayingStateUpdate"));
+    fl_value_set_string(map, "value", fl_value_new_bool(isPlaying));
     fl_event_channel_send(this->_eventChannel, map, nullptr, nullptr);
   }
 }

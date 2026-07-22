@@ -1,4 +1,5 @@
 import AVKit
+import Combine
 
 private let defaultPlaybackRate: Double = 1.0
 
@@ -29,7 +30,6 @@ enum ReleaseMode: String {
 
   private var completionObserver: TimeObserver?
   private var playerItemStatusObservation: NSKeyValueObservation?
-
   init(
     reference: AudioplayersDarwinPlugin,
     eventHandler: AudioPlayersStreamHandler,
@@ -50,6 +50,7 @@ enum ReleaseMode: String {
     self.volume = volume
     self.releaseMode = releaseMode
     self.url = url
+    setUpPlayerObservation(player)
   }
 
   func setSourceUrl(
@@ -147,6 +148,7 @@ enum ReleaseMode: String {
 
   func dispose() async {
     await release()
+    removePlayerObservation(player)
     self.eventHandler.dispose()
   }
 
@@ -188,6 +190,29 @@ enum ReleaseMode: String {
 
     playerItem.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithm.timeDomain
     return playerItem
+  }
+
+  private var cancellables = Set<AnyCancellable>()
+
+  private func setUpPlayerObservation(_ player: AVPlayer) {
+    player.publisher(for: \.timeControlStatus)
+      .removeDuplicates()
+      .receive(on: DispatchQueue.main)
+      .sink { status in
+        switch status {
+        case .paused:
+          self.eventHandler.onPlayingStateUpdate(isPlaying: false)
+        case .playing:
+          self.eventHandler.onPlayingStateUpdate(isPlaying: true)
+        @unknown default:
+          break
+        }
+      }
+      .store(in: &cancellables)
+  }
+
+  private func removePlayerObservation(_ player: AVPlayer) {
+    cancellables.removeAll()
   }
 
   private func setUpPlayerItemStatusObservation(
