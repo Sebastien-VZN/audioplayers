@@ -16,13 +16,14 @@ dependencies:
   path_provider: ^2.1.5
 
 dev_dependencies:
-  # Integration tests for audioplayers_platform_interface are handled 
+  # Integration tests for audioplayers_platform_interface are handled
   # in this package to avoid maintaining multiple example apps:
   audioplayers_platform_interface:
     path: ../../audioplayers_platform_interface
-  flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
+  test: ^1.26.3
+  very_good_analysis: ^10.2.0
 
 flutter:
   uses-material-design: true
@@ -31,4 +32,4 @@ flutter:
 
 environment:
   sdk: ^3.6.0
-  flutter: '>=3.27.0'
+  flutter: ">=3.27.0"
