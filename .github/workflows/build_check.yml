@@ -189,34 +189,6 @@ jobs:
           path: audioplayers-ios.zip
           retention-days: 1
 
-  purge-artifacts:
-    name: "Purger les anciens artifacts"
-    runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch'
-    permissions:
-      actions: write
-    steps:
-      - name: "Supprimer tous les artifacts"
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const artifacts = await github.paginate(
-              github.rest.actions.listArtifactsForRepo, {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                per_page: 100
-              }
-            );
-            for (const artifact of artifacts) {
-              console.log(`Deleting artifact: ${artifact.name} (#${artifact.id})`);
-              await github.rest.actions.deleteArtifact({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                artifact_id: artifact.id
-              });
-            }
-            console.log(`Deleted ${artifacts.length} artifacts.`);
-
   release:
     name: "Création de la Release GitHub"
     needs: [android-build, linux-build, windows-build, web-build, macos-build, ios-build, windows-native-test]

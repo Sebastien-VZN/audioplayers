@@ -1,34 +1,21 @@
 name: Purge Artifacts
 
 on:
+  schedule:
+    - cron: '0 1 * * *'
   workflow_dispatch:
 
 jobs:
   purge:
-    name: "Supprimer tous les artifacts"
+    name: "Supprimer les anciens artifacts"
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       actions: write
     steps:
-      - name: "Purger"
-        uses: actions/github-script@v7
+      - name: "Purger les artifacts de plus de 30 jours"
+        uses: c-hive/gha-remove-artifacts@v1
         with:
-          script: |
-            const artifacts = await github.paginate(
-              github.rest.actions.listArtifactsForRepo, {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                per_page: 100
-              }
-            );
-            let count = 0;
-            for (const artifact of artifacts) {
-              console.log(`Deleting: ${artifact.name} (#${artifact.id})`);
-              await github.rest.actions.deleteArtifact({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                artifact_id: artifact.id
-              });
-              count++;
-            }
-            console.log(`Deleted ${count} artifacts.`);
+          age: '1 month'
+          skip-tags: true
+          skip-recent: 2
