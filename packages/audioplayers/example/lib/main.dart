@@ -168,11 +168,12 @@ class _ExampleAppState extends State<_ExampleApp> {
                     scrollDirection: Axis.horizontal,
                     child: Tgl(
                       key: const Key('playerTgl'),
-                      options: [
-                        for (var i = 1; i <= audioPlayers.length; i++) i,
-                      ]
-                          .asMap()
-                          .map((key, val) => MapEntry('player-$key', 'P$val')),
+                      options:
+                          [
+                            for (var i = 1; i <= audioPlayers.length; i++) i,
+                          ].asMap().map(
+                            (key, val) => MapEntry('player-$key', 'P$val'),
+                          ),
                       selected: selectedPlayerIdx,
                       onChange: (v) => setState(() => selectedPlayerIdx = v),
                     ),

@@ -29,12 +29,12 @@ class _StreamWidgetState extends State<StreamWidget> {
   Future<bool> _init() async {
     // Use initial values from player
     streamState = player.state;
-    await player
-        .getDuration()
-        .then((it) => setState(() => streamDuration = it));
+    await player.getDuration().then(
+      (it) => setState(() => streamDuration = it),
+    );
     await player.getCurrentPosition().then(
-          (it) => setState(() => streamPosition = it),
-        );
+      (it) => setState(() => streamPosition = it),
+    );
 
     streams = <StreamSubscription<dynamic>>[
       player.onDurationChanged.listen(
