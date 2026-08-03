@@ -7,13 +7,14 @@ import 'package:flutter/foundation.dart';
 /// configurations: [AudioContextAndroid] and [AudioContextIOS].
 @immutable
 class AudioContext {
-  final AudioContextAndroid android;
-  late final AudioContextIOS iOS;
-
-  AudioContext({AudioContextAndroid? android, AudioContextIOS? iOS})
-      : android = android ?? const AudioContextAndroid() {
+  AudioContext({
+    AudioContextAndroid? android,
+    AudioContextIOS? iOS,
+  }) : android = android ?? const AudioContextAndroid() {
     this.iOS = iOS ?? AudioContextIOS();
   }
+  final AudioContextAndroid android;
+  late final AudioContextIOS iOS;
 
   AudioContext copy({AudioContextAndroid? android, AudioContextIOS? iOS}) {
     return AudioContext(android: android ?? this.android, iOS: iOS ?? this.iOS);

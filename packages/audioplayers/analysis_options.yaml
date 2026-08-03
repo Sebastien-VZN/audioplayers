@@ -1,6 +1,3 @@
-# Configuration de l'analyse statique Axomind (Mode Ultra-Strict)
-# Basé sur Very Good Analysis : https://pub.dev/packages/very_good_analysis
-
 include: package:very_good_analysis/analysis_options.yaml
 
 analyzer:
@@ -8,13 +5,13 @@ analyzer:
     strict-casts: true
     strict-inference: true
     strict-raw-types: true
-    
+
   errors:
     todo: ignore
     missing_required_param: error
     missing_return: error
     parameter_assignments: warning
-  
+
   exclude:
     - "build/**"
     - "**/*.g.dart"
@@ -39,4 +36,3 @@ linter:
     avoid_equals_and_hash_code_on_mutable_classes: false
     sort_pub_dependencies: false
     unreachable_from_main: false
-

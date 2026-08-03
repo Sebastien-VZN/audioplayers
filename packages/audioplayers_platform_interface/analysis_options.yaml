@@ -1,9 +1,42 @@
-include: package:flutter_lints/flutter.yaml
+# Configuration de l'analyse statique Axomind (Mode Ultra-Strict)
+# Basé sur Very Good Analysis : https://pub.dev/packages/very_good_analysis
+
+include: package:very_good_analysis/analysis_options.yaml
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+
+  errors:
+    todo: ignore
+    missing_required_param: error
+    missing_return: error
+    parameter_assignments: warning
+
+  exclude:
+    - "build/**"
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
 
 linter:
   rules:
-    - avoid_print
-    - prefer_single_quotes
-    - sort_child_properties_last
-    - unawaited_futures
-    - unsafe_html
+    # --- Personnalisation des règles Axomind ---
+    lines_longer_than_80_chars: false # Désactivé car trop restrictif pour Flutter
+    public_member_api_docs: false # On ne force pas la doc sur chaque membre public
+    always_use_package_imports: true # Force les imports package: (plus propre)
+    avoid_print: true
+    curly_braces_in_flow_control_structures: true
+    unawaited_futures: true
+    avoid_void_async: true
+    cancel_subscriptions: true
+    close_sinks: true
+    sort_constructors_first: true
+    prefer_single_quotes: false # Axomind utilise majoritairement des double quotes
+    avoid_positional_boolean_parameters: false
+    avoid_dynamic_calls: false
+    avoid_equals_and_hash_code_on_mutable_classes: false
+    sort_pub_dependencies: false
+    unreachable_from_main: false
+
