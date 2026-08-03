@@ -173,8 +173,7 @@ mixin MethodChannelAudioplayersPlatform
   }
 }
 
-mixin EventChannelAudioplayersPlatform
-    implements EventChannelAudioplayersPlatformInterface {
+mixin EventChannelAudioplayersPlatform {
   final Map<String, Stream<AudioEvent>> streams = {};
 
   // Only can be used after have created the event channel on the native side.
@@ -218,7 +217,6 @@ mixin EventChannelAudioplayersPlatform
     }
   }
 
-  @override
   Stream<AudioEvent> getEventStream(String playerId) {
     return streams[playerId]!;
   }

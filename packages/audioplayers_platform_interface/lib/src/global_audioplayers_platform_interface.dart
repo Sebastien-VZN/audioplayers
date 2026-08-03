@@ -4,11 +4,11 @@ import 'package:audioplayers_platform_interface/src/global_audioplayers_platform
 import 'package:meta/meta.dart';
 
 abstract class GlobalAudioplayersPlatformInterface
-    implements
-        MethodChannelGlobalAudioplayersPlatformInterface,
-        EventChannelGlobalAudioplayersPlatformInterface {
+    implements MethodChannelGlobalAudioplayersPlatformInterface {
   static GlobalAudioplayersPlatformInterface instance =
       GlobalAudioplayersPlatform();
+
+  Stream<GlobalAudioEvent> getGlobalEventStream();
 }
 
 abstract class MethodChannelGlobalAudioplayersPlatformInterface {
@@ -25,8 +25,4 @@ abstract class MethodChannelGlobalAudioplayersPlatformInterface {
 
   @visibleForTesting
   Future<void> emitGlobalError(String code, String message);
-}
-
-abstract class EventChannelGlobalAudioplayersPlatformInterface {
-  Stream<GlobalAudioEvent> getGlobalEventStream();
 }

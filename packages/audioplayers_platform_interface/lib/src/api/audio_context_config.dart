@@ -14,6 +14,13 @@ import 'package:flutter/foundation.dart';
 /// If these simplified flags cannot fully reflect your goals, you must create
 /// an [AudioContext] configuring each platform separately.
 class AudioContextConfig {
+  AudioContextConfig({
+    this.route = AudioContextConfigRoute.system,
+    this.focus = AudioContextConfigFocus.gain,
+    this.respectSilence = false,
+    this.stayAwake = false,
+  });
+
   /// Normally, audio played will respect the devices configured preferences.
   /// However, if you want to bypass that and flag the system to use the
   /// built-in speakers or the earpiece, you can set this flag.
@@ -53,13 +60,6 @@ class AudioContextConfig {
   ///  * the UIBackgroundModes audio key has been added to your app’s
   ///    Info.plist (check our FAQ for more details on that)
   final bool stayAwake;
-
-  AudioContextConfig({
-    this.route = AudioContextConfigRoute.system,
-    this.focus = AudioContextConfigFocus.gain,
-    this.respectSilence = false,
-    this.stayAwake = false,
-  });
 
   AudioContextConfig copy({
     AudioContextConfigRoute? route,

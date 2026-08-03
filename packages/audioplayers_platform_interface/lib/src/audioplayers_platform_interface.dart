@@ -18,9 +18,7 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 /// `implements` this interface will be broken by newly added
 /// [AudioplayersPlatformInterface] methods.
 abstract class AudioplayersPlatformInterface extends PlatformInterface
-    implements
-        MethodChannelAudioplayersPlatformInterface,
-        EventChannelAudioplayersPlatformInterface {
+    implements MethodChannelAudioplayersPlatformInterface {
   AudioplayersPlatformInterface() : super(token: _token);
 
   static final Object _token = Object();
@@ -128,13 +126,11 @@ abstract class MethodChannelAudioplayersPlatformInterface {
   ///  * otherwise not supported (e.g. LOW_LATENCY mode on Android)
   Future<int?> getCurrentPosition(String playerId);
 
+  Stream<AudioEvent> getEventStream(String playerId);
+
   @visibleForTesting
   Future<void> emitLog(String playerId, String message);
 
   @visibleForTesting
   Future<void> emitError(String playerId, String code, String message);
-}
-
-abstract class EventChannelAudioplayersPlatformInterface {
-  Stream<AudioEvent> getEventStream(String playerId);
 }

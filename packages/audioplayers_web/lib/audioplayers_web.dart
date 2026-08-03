@@ -93,12 +93,12 @@ class WebAudioplayersPlatform extends AudioplayersPlatformInterface {
 
   @override
   Future<void> setPlaybackRate(String playerId, double playbackRate) async {
-    getPlayer(playerId).playbackRate = playbackRate;
+    getPlayer(playerId).playbackRate(playbackRate);
   }
 
   @override
   Future<void> setReleaseMode(String playerId, ReleaseMode releaseMode) async {
-    getPlayer(playerId).releaseMode = releaseMode;
+    getPlayer(playerId).releaseMode(releaseMode);
   }
 
   @override
@@ -124,7 +124,7 @@ class WebAudioplayersPlatform extends AudioplayersPlatformInterface {
 
   @override
   Future<void> setVolume(String playerId, double volume) async {
-    getPlayer(playerId).volume = volume;
+    getPlayer(playerId).volume(volume);
   }
 
   @override

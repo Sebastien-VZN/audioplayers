@@ -44,13 +44,11 @@ mixin MethodChannelGlobalAudioplayersPlatform
   }
 }
 
-mixin EventChannelGlobalAudioplayersPlatform
-    implements EventChannelGlobalAudioplayersPlatformInterface {
+mixin EventChannelGlobalAudioplayersPlatform {
   static const _globalEventChannel = EventChannel(
     'xyz.luan/audioplayers.global/events',
   );
 
-  @override
   Stream<GlobalAudioEvent> getGlobalEventStream() {
     return _globalEventChannel.receiveBroadcastStream().map((dynamic event) {
       final map = event as Map<dynamic, dynamic>;

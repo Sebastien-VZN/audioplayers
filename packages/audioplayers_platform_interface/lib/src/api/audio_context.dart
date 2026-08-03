@@ -59,6 +59,16 @@ class AudioContext {
 /// Android audio stream.
 @immutable
 class AudioContextAndroid {
+  // Note when changing the defaults, it should also be changed in native code.
+  const AudioContextAndroid({
+    this.isSpeakerphoneOn = false,
+    this.audioMode = AndroidAudioMode.normal,
+    this.stayAwake = false,
+    this.contentType = AndroidContentType.music,
+    this.usageType = AndroidUsageType.media,
+    this.audioFocus = AndroidAudioFocus.gain,
+  });
+
   /// Sets the speakerphone on or off, globally.
   ///
   /// This method should only be used by applications that replace the
@@ -77,16 +87,6 @@ class AudioContextAndroid {
   final AndroidContentType contentType;
   final AndroidUsageType usageType;
   final AndroidAudioFocus audioFocus;
-
-  // Note when changing the defaults, it should also be changed in native code.
-  const AudioContextAndroid({
-    this.isSpeakerphoneOn = false,
-    this.audioMode = AndroidAudioMode.normal,
-    this.stayAwake = false,
-    this.contentType = AndroidContentType.music,
-    this.usageType = AndroidUsageType.media,
-    this.audioFocus = AndroidAudioFocus.gain,
-  });
 
   AudioContextAndroid copy({
     bool? isSpeakerphoneOn,
@@ -157,9 +157,6 @@ class AudioContextAndroid {
 /// iOS audio stream.
 @immutable
 class AudioContextIOS {
-  final AVAudioSessionCategory category;
-  final Set<AVAudioSessionOptions> options;
-
   // Note when changing the defaults, it should also be changed in native code.
   AudioContextIOS({
     this.category = AVAudioSessionCategory.playback,
@@ -231,6 +228,8 @@ class AudioContextIOS {
           'explicitly only if the audio session category is `playAndRecord`, '
           '`record`, or `multiRoute`.',
         );
+  final AVAudioSessionCategory category;
+  final Set<AVAudioSessionOptions> options;
 
   AudioContextIOS copy({
     AVAudioSessionCategory? category,
@@ -255,7 +254,8 @@ class AudioContextIOS {
         other is AudioContextIOS &&
             runtimeType == other.runtimeType &&
             category == other.category &&
-            const SetEquality().equals(options, other.options);
+            const SetEquality<AVAudioSessionOptions>()
+                .equals(options, other.options);
   }
 
   @override

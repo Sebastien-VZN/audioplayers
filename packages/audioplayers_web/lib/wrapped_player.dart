@@ -7,12 +7,13 @@ import 'package:flutter/services.dart';
 import 'package:web/web.dart' as web;
 
 class WrappedPlayer {
+  WrappedPlayer(this.playerId);
   final String playerId;
   final eventStreamController = StreamController<AudioEvent>.broadcast();
 
   double? _pausedAt;
-  double _currentVolume = 1.0;
-  double _currentPlaybackRate = 1.0;
+  double _currentVolume = 1;
+  double _currentPlaybackRate = 1;
   ReleaseMode _currentReleaseMode = ReleaseMode.release;
   String? _currentUrl;
   bool _isPlaying = false;
@@ -21,13 +22,11 @@ class WrappedPlayer {
   web.AudioContext? _audioContext;
   web.MediaElementAudioSourceNode? _sourceNode;
   web.StereoPannerNode? _stereoPanner;
-  StreamSubscription? _playerEndedSubscription;
-  StreamSubscription? _playerLoadedDataSubscription;
-  StreamSubscription? _playerPlaySubscription;
-  StreamSubscription? _playerSeekedSubscription;
-  StreamSubscription? _playerErrorSubscription;
-
-  WrappedPlayer(this.playerId);
+  StreamSubscription<web.Event>? _playerEndedSubscription;
+  StreamSubscription<web.Event>? _playerLoadedDataSubscription;
+  StreamSubscription<web.Event>? _playerPlaySubscription;
+  StreamSubscription<web.Event>? _playerSeekedSubscription;
+  StreamSubscription<web.Event>? _playerErrorSubscription;
 
   Future<void> setUrl(String url) async {
     if (_currentUrl == url) {
@@ -45,16 +44,17 @@ class WrappedPlayer {
     }
   }
 
-  set volume(double volume) {
+  void volume(double volume) {
     _currentVolume = volume;
     player?.volume = volume;
   }
 
+  double get balance => _stereoPanner?.pan.value ?? 0.0;
   set balance(double balance) {
-    _stereoPanner?.pan.value = balance;
+    if (_stereoPanner != null) _stereoPanner!.pan.value = balance;
   }
 
-  set playbackRate(double rate) {
+  void playbackRate(double rate) {
     _currentPlaybackRate = rate;
     player?.playbackRate = rate;
   }
@@ -65,16 +65,16 @@ class WrappedPlayer {
       return;
     }
 
-    final p = player = web.HTMLAudioElement();
-    p.preload = 'auto';
-    p.src = currentUrl;
-    // As the AudioElement is created dynamically via script,
-    // features like 'stereo panning' need the CORS header to be enabled.
-    // See: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
-    p.crossOrigin = 'anonymous';
-    p.loop = shouldLoop();
-    p.volume = _currentVolume;
-    p.playbackRate = _currentPlaybackRate;
+    final p = player = web.HTMLAudioElement()
+      ..preload = 'auto'
+      ..src = currentUrl
+      // As the AudioElement is created dynamically via script,
+      // features like 'stereo panning' need the CORS header to be enabled.
+      // See: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+      ..crossOrigin = 'anonymous'
+      ..loop = shouldLoop()
+      ..volume = _currentVolume
+      ..playbackRate = _currentPlaybackRate;
 
     _setupStreams(p);
 
@@ -94,18 +94,19 @@ class WrappedPlayer {
   void _setupStreams(web.HTMLAudioElement p) {
     _playerLoadedDataSubscription = p.onLoadedData.listen(
       (_) {
-        eventStreamController.add(
-          const AudioEvent(
-            eventType: AudioEventType.prepared,
-            isPrepared: true,
-          ),
-        );
-        eventStreamController.add(
-          AudioEvent(
-            eventType: AudioEventType.duration,
-            duration: p.duration.fromSecondsToDuration(),
-          ),
-        );
+        eventStreamController
+          ..add(
+            const AudioEvent(
+              eventType: AudioEventType.prepared,
+              isPrepared: true,
+            ),
+          )
+          ..add(
+            AudioEvent(
+              eventType: AudioEventType.duration,
+              duration: p.duration.fromSecondsToDuration(),
+            ),
+          );
       },
       onError: eventStreamController.addError,
     );
@@ -168,7 +169,7 @@ class WrappedPlayer {
 
   bool shouldLoop() => _currentReleaseMode == ReleaseMode.loop;
 
-  set releaseMode(ReleaseMode releaseMode) {
+  void releaseMode(ReleaseMode releaseMode) {
     _currentReleaseMode = releaseMode;
     player?.loop = shouldLoop();
   }
@@ -222,8 +223,8 @@ class WrappedPlayer {
   }
 
   void pause() {
-    // ignore: unnecessary_cast
-    _pausedAt = player?.currentTime as double?;
+    if (player == null) return;
+    _pausedAt = double.tryParse(player!.currentTime.toString()) ?? 0;
     _isPlaying = false;
     player?.pause();
   }
