@@ -1,20 +1,12 @@
-// ignore_for_file: avoid_print
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:async/async.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
 class StreamRoute {
-  static const timesRadioUrl = 'https://timesradio.wireless.radio/stream';
-  static const mpegRecordPath = 'public/files/live_streams/mpeg-record.bin';
-
-  final mpegStreamController = StreamController<List<int>>.broadcast();
-
-  StreamRoute({bool isLiveMode = false, bool isRecordMode = false})
-      : assert(!isRecordMode || isLiveMode) {
+  StreamRoute({bool isLiveMode = false, bool isRecordMode = false}) {
     if (isRecordMode) {
       unawaited(recordLiveStream());
     }
@@ -24,6 +16,9 @@ class StreamRoute {
       unawaited(playLocalStream());
     }
   }
+  static const timesRadioUrl = 'https://timesradio.wireless.radio/stream';
+  static const mpegRecordPath = 'public/files/live_streams/mpeg-record.bin';
+  final mpegStreamController = StreamController<List<int>>.broadcast();
 
   Future<void> recordLiveStream() async {
     const recordingTime = Duration(seconds: 10);
@@ -34,19 +29,18 @@ class StreamRoute {
     final mpegSub = mpegStreamController.stream.listen((bytes) async {
       fileBytes.addAll([...int32ToBytes(bytes.length), ...bytes]);
     });
-    unawaited(Future.delayed(recordingTime).then((value) async {
-      print('Recording finished');
-      await mpegSub.cancel();
-      await recordOutput.writeAsBytes(fileBytes, flush: true);
-    }));
+
+    await Future<void>.delayed(recordingTime);
+    await mpegSub.cancel();
+    await recordOutput.writeAsBytes(fileBytes, flush: true);
+
+    debugPrint('Recording finished');
   }
 
   Uint8List int32ToBytes(int value) =>
       Uint8List(4)..buffer.asInt32List()[0] = value;
-
   int bytesToInt32(List<int> bytes) =>
       Uint8List.fromList(bytes).buffer.asInt32List()[0];
-
   Future<void> playLiveStream() async {
     final client = HttpClient();
     final request = await client.getUrl(Uri.parse(timesRadioUrl));
@@ -77,57 +71,56 @@ class StreamRoute {
   }
 
   Router get router {
-    final router = Router();
-    router.get('/wav', (Request request) async {
-      final range = request.headers['range'];
-      const contentType = {'Content-Type': 'audio/wav'};
-      final file = File('public/files/audio/laser.wav');
-      if (range != null) {
-        final fileSize = await file.length();
+    final router = Router()
+      ..get('/wav', (Request request) async {
+        final range = request.headers['range'];
+        const contentType = {'Content-Type': 'audio/wav'};
+        final file = File('public/files/audio/laser.wav');
+        if (range != null) {
+          final fileSize = await file.length();
 
-        final parts = range.replaceFirst('bytes=', '').split('-');
-        final start = int.parse(parts[0]);
-        final end = int.tryParse(parts[1]) ?? fileSize - 1;
+          final parts = range.replaceFirst('bytes=', '').split('-');
+          final start = int.parse(parts[0]);
+          final end = int.tryParse(parts[1]) ?? fileSize - 1;
 
-        if (start >= fileSize) {
-          return Response(
-            416,
-            body: 'Requested range not satisfiable\n$start >= $fileSize',
+          if (start >= fileSize) {
+            return Response(
+              416,
+              body: 'Requested range not satisfiable\n$start >= $fileSize',
+            );
+          }
+
+          final streamReader = ChunkedStreamReader<int>(file.openRead());
+          final chunkLength = end - start + 1;
+          final head = {
+            'Content-Range': 'bytes $start-$end/$fileSize',
+            'Accept-Ranges': 'bytes',
+            'Content-Length': '$chunkLength',
+            ...contentType,
+          };
+          if (start > 0) {
+            await streamReader.readChunk(start);
+          }
+          final res = Response.ok(
+            await streamReader.readChunk(chunkLength),
+            headers: head,
           );
+          return res;
+        } else {
+          final bytes = await file.readAsBytes();
+          final fileSize = bytes.length;
+          final head = {'Content-Length': '$fileSize', ...contentType};
+          final res = Response.ok(bytes.toList(), headers: head);
+          return res;
         }
+      })
+      ..get('/mpeg', (Request request) async {
+        const contentType = {'Content-Type': 'audio/mpeg'};
 
-        final streamReader = ChunkedStreamReader<int>(file.openRead());
-        final chunkLength = end - start + 1;
-        final head = {
-          'Content-Range': 'bytes $start-$end/$fileSize',
-          'Accept-Ranges': 'bytes',
-          'Content-Length': '$chunkLength',
-          ...contentType,
-        };
-        if (start > 0) {
-          await streamReader.readChunk(start);
-        }
-        final res = Response.ok(
-          await streamReader.readChunk(chunkLength),
-          headers: head,
-        );
+        final head = {'Accept-Ranges': 'bytes', ...contentType};
+        final res = Response.ok(mpegStreamController.stream, headers: head);
         return res;
-      } else {
-        final bytes = await file.readAsBytes();
-        final fileSize = bytes.length;
-        final head = {'Content-Length': '$fileSize', ...contentType};
-        final res = Response.ok(bytes.toList(), headers: head);
-        return res;
-      }
-    });
-
-    router.get('/mpeg', (Request request) async {
-      const contentType = {'Content-Type': 'audio/mpeg'};
-
-      final head = {'Accept-Ranges': 'bytes', ...contentType};
-      final res = Response.ok(mpegStreamController.stream, headers: head);
-      return res;
-    });
+      });
     return router;
   }
 

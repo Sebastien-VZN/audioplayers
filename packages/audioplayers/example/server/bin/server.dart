@@ -1,6 +1,6 @@
-// ignore_for_file: avoid_print
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_router/shelf_router.dart' as shelf_router;
@@ -55,7 +55,7 @@ Future<void> main() async {
     port,
   );
 
-  print(
+  debugPrint(
     'Serving at http://${server.address.host}:${server.port} with latency of $requestTimeoutMillis ms',
   );
 }

@@ -2,7 +2,7 @@ name: audioplayers_linux
 resolution: workspace
 publish_to: none
 description: Linux implementation of audioplayers, a Flutter plugin to play multiple audio files simultaneously
-version: 4.2.3
+version: 4.2.4
 homepage: https://github.com/Sebastien-VZN/audioplayers
 repository: https://github.com/Sebastien-VZN/audioplayers/tree/main/packages/audioplayers_linux
 
@@ -20,10 +20,10 @@ dependencies:
     sdk: flutter
 
 dev_dependencies:
-  flutter_lints: ^6.0.0
+  very_good_analysis: ^10.2.0
   flutter_test:
     sdk: flutter
 
 environment:
-  sdk: ^3.6.0
+  sdk: ^3.12.0
   flutter: '>=3.27.0'
