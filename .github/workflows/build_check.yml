@@ -21,7 +21,7 @@ jobs:
         run: flutter pub get
 
       - name: "Vérification Formatage"
-        run: dart format --output=none --set-exit-if-changed .
+        run: dart format --line-length=150 --output=none --set-exit-if-changed .
 
       - name: "Analyse Statique (Linter)"
         run: flutter analyze --no-fatal-infos --no-fatal-warnings .
