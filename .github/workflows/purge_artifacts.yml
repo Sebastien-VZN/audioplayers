@@ -14,7 +14,7 @@ jobs:
       actions: write
     steps:
       - name: "Purger les artifacts de plus de 30 jours"
-        uses: c-hive/gha-remove-artifacts@v1
+        uses: c-hive/gha-remove-artifacts@ca9712b
         with:
           age: '1 month'
           skip-tags: true
