@@ -10,8 +10,7 @@ class LoggerTab extends StatefulWidget {
   LoggerTabState createState() => LoggerTabState();
 }
 
-class LoggerTabState extends State<LoggerTab>
-    with AutomaticKeepAliveClientMixin<LoggerTab> {
+class LoggerTabState extends State<LoggerTab> with AutomaticKeepAliveClientMixin<LoggerTab> {
   AudioLogLevel get currentLogLevel => AudioLogger.logLevel;
 
   set currentLogLevel(AudioLogLevel level) {
@@ -156,9 +155,7 @@ class LogView extends StatelessWidget {
                     children: [
                       SelectableText(
                         '${log.level}: ${log.message}',
-                        style: log.level == AudioLogLevel.error
-                            ? const TextStyle(color: Colors.red)
-                            : null,
+                        style: log.level == AudioLogLevel.error ? const TextStyle(color: Colors.red) : null,
                       ),
                       Divider(color: Colors.grey.shade400),
                     ],

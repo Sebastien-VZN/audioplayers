@@ -7,13 +7,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
-class MockAudioplayersPlatform extends Mock
-    with MockPlatformInterfaceMixin
-    implements AudioplayersPlatformInterface {}
+class MockAudioplayersPlatform extends Mock with MockPlatformInterfaceMixin implements AudioplayersPlatformInterface {}
 
-class MockGlobalAudioplayersPlatform extends Mock
-    with MockPlatformInterfaceMixin
-    implements GlobalAudioplayersPlatformInterface {}
+class MockGlobalAudioplayersPlatform extends Mock with MockPlatformInterfaceMixin implements GlobalAudioplayersPlatformInterface {}
 
 class MockAudioCache extends Mock implements AudioCache {}
 
@@ -46,13 +42,11 @@ void main() {
 
     // Stubbing global platform
     when(() => mockGlobalPlatform.init()).thenAnswer((_) async {});
-    when(() => mockGlobalPlatform.getGlobalEventStream())
-        .thenAnswer((_) => const Stream<GlobalAudioEvent>.empty());
+    when(() => mockGlobalPlatform.getGlobalEventStream()).thenAnswer((_) => const Stream<GlobalAudioEvent>.empty());
 
     // Stubbing player platform basic methods
     when(() => mockPlatform.create(any())).thenAnswer((_) async {});
-    when(() => mockPlatform.getEventStream(any()))
-        .thenAnswer((_) => eventController.stream);
+    when(() => mockPlatform.getEventStream(any())).thenAnswer((_) => eventController.stream);
     when(() => mockPlatform.dispose(any())).thenAnswer((_) async {});
     when(
       () => mockPlatform.setSourceUrl(
@@ -76,10 +70,8 @@ void main() {
     when(() => mockPlatform.seek(any(), any())).thenAnswer((_) async {});
     when(() => mockPlatform.setVolume(any(), any())).thenAnswer((_) async {});
     when(() => mockPlatform.setBalance(any(), any())).thenAnswer((_) async {});
-    when(() => mockPlatform.setPlaybackRate(any(), any()))
-        .thenAnswer((_) async {});
-    when(() => mockPlatform.getCurrentPosition(any()))
-        .thenAnswer((_) async => 0);
+    when(() => mockPlatform.setPlaybackRate(any(), any())).thenAnswer((_) async {});
+    when(() => mockPlatform.getCurrentPosition(any())).thenAnswer((_) async => 0);
     when(() => mockPlatform.getDuration(any())).thenAnswer((_) async => 0);
 
     player = AudioPlayer()..audioCache = mockCache;
@@ -97,8 +89,7 @@ void main() {
     test('play() with UrlSource calls setSourceUrl and resume', () async {
       await player.creatingCompleter.future;
 
-      final playFuture =
-          player.play(UrlSource('https://example.com/audio.mp3'));
+      final playFuture = player.play(UrlSource('https://example.com/audio.mp3'));
       await Future<void>.delayed(const Duration(milliseconds: 100));
       eventController.add(
         const AudioEvent(
@@ -123,8 +114,7 @@ void main() {
 
     test('play() with AssetSource calls AudioCache and setSourceUrl', () async {
       await player.creatingCompleter.future;
-      when(() => mockCache.loadPath('sounds/test.mp3'))
-          .thenAnswer((_) async => 'assets/sounds/test.mp3');
+      when(() => mockCache.loadPath('sounds/test.mp3')).thenAnswer((_) async => 'assets/sounds/test.mp3');
 
       final playFuture = player.play(AssetSource('sounds/test.mp3'));
       await Future<void>.delayed(const Duration(milliseconds: 100));
@@ -210,8 +200,7 @@ void main() {
       verify(() => mockPlatform.setBalance(player.playerId, -1)).called(1);
 
       await player.setPlaybackRate(1.5);
-      verify(() => mockPlatform.setPlaybackRate(player.playerId, 1.5))
-          .called(1);
+      verify(() => mockPlatform.setPlaybackRate(player.playerId, 1.5)).called(1);
     });
 
     test('handles platform errors via stream', () async {

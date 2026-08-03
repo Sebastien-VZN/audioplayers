@@ -19,13 +19,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
-class MockAudioplayersPlatform extends Mock
-    with MockPlatformInterfaceMixin
-    implements AudioplayersPlatformInterface {}
+class MockAudioplayersPlatform extends Mock with MockPlatformInterfaceMixin implements AudioplayersPlatformInterface {}
 
-class MockGlobalAudioplayersPlatform extends Mock
-    with MockPlatformInterfaceMixin
-    implements GlobalAudioplayersPlatformInterface {}
+class MockGlobalAudioplayersPlatform extends Mock with MockPlatformInterfaceMixin implements GlobalAudioplayersPlatformInterface {}
 
 class MockAudioCache extends Mock implements AudioCache {}
 

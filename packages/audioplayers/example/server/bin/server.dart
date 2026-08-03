@@ -13,8 +13,7 @@ Future<void> main() async {
   final requestTimeoutMillis = int.parse(
     Platform.environment['LATENCY'] ?? '0',
   );
-  final isLogRequests =
-      (Platform.environment['LOG_REQUESTS'] ?? 'false') == 'true';
+  final isLogRequests = (Platform.environment['LOG_REQUESTS'] ?? 'false') == 'true';
 
   final publicStaticHandler = shelf_static.createStaticHandler(
     'public',
@@ -23,8 +22,7 @@ Future<void> main() async {
   );
 
   final recordMode = bool.parse(Platform.environment['RECORD_MODE'] ?? 'false');
-  final liveMode =
-      recordMode || bool.parse(Platform.environment['LIVE_MODE'] ?? 'false');
+  final liveMode = recordMode || bool.parse(Platform.environment['LIVE_MODE'] ?? 'false');
   final routeHandler = shelf_router.Router()
     ..mount(
       '/stream',

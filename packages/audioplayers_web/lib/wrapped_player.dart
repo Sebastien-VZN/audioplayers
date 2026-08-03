@@ -158,7 +158,8 @@ class WrappedPlayer {
           PlatformException(
             code: 'WebAudioError',
             message: platformMsg,
-            details: '${p.error?.runtimeType}: '
+            details:
+                '${p.error?.runtimeType}: '
                 '${p.error?.message} (Code: ${p.error?.code})',
           ),
         );

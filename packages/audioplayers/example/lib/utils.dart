@@ -35,8 +35,6 @@ extension PlayerStateIcon on PlayerState {
   IconData getIcon() {
     return this == PlayerState.playing
         ? Icons.play_arrow
-        : (this == PlayerState.paused
-              ? Icons.pause
-              : (this == PlayerState.stopped ? Icons.stop : Icons.stop_circle));
+        : (this == PlayerState.paused ? Icons.pause : (this == PlayerState.stopped ? Icons.stop : Icons.stop_circle));
   }
 }

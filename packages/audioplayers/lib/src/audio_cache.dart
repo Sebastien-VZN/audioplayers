@@ -25,8 +25,7 @@ const _uuid = Uuid();
 /// For most normal uses, the static instance is used. But if you want to
 /// control multiple caches, you can create your own instances.
 class AudioCache {
-  AudioCache({this.prefix = 'assets/', String? cacheId})
-      : cacheId = cacheId ?? _uuid.v4();
+  AudioCache({this.prefix = 'assets/', String? cacheId}) : cacheId = cacheId ?? _uuid.v4();
 
   /// A globally accessible instance used by default by all players.
   static AudioCache instance = AudioCache();
@@ -131,9 +130,7 @@ class AudioCache {
     // On Android, verify that the cached file still exists. It can be removed
     // by the system when the storage is almost full
     // see https://developer.android.com/training/data-storage/app-specific#internal-remove-cache
-    if (!needsFetch &&
-        defaultTargetPlatform == TargetPlatform.android &&
-        !fileSystem.file(loadedFiles[fileName]).existsSync()) {
+    if (!needsFetch && defaultTargetPlatform == TargetPlatform.android && !fileSystem.file(loadedFiles[fileName]).existsSync()) {
       needsFetch = true;
     }
 

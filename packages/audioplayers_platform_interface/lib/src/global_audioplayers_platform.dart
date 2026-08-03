@@ -6,14 +6,11 @@ import 'package:audioplayers_platform_interface/src/method_channel_extension.dar
 import 'package:flutter/services.dart';
 
 class GlobalAudioplayersPlatform extends GlobalAudioplayersPlatformInterface
-    with
-        MethodChannelGlobalAudioplayersPlatform,
-        EventChannelGlobalAudioplayersPlatform {
+    with MethodChannelGlobalAudioplayersPlatform, EventChannelGlobalAudioplayersPlatform {
   GlobalAudioplayersPlatform();
 }
 
-mixin MethodChannelGlobalAudioplayersPlatform
-    implements MethodChannelGlobalAudioplayersPlatformInterface {
+mixin MethodChannelGlobalAudioplayersPlatform implements MethodChannelGlobalAudioplayersPlatformInterface {
   static const MethodChannel _globalMethodChannel = MethodChannel(
     'xyz.luan/audioplayers.global',
   );

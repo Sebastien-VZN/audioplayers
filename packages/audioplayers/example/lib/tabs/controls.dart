@@ -17,8 +17,7 @@ class ControlsTab extends StatefulWidget {
   State<ControlsTab> createState() => _ControlsTabState();
 }
 
-class _ControlsTabState extends State<ControlsTab>
-    with AutomaticKeepAliveClientMixin<ControlsTab> {
+class _ControlsTabState extends State<ControlsTab> with AutomaticKeepAliveClientMixin<ControlsTab> {
   String modalInputSeek = '';
 
   Future<void> _update(Future<void> Function() fn) async {
@@ -112,8 +111,7 @@ class _ControlsTabState extends State<ControlsTab>
             EnumTgl<PlayerMode>(
               key: const Key('control-player-mode'),
               options: {
-                for (final e in PlayerMode.values)
-                  'control-player-mode-${e.name}': e,
+                for (final e in PlayerMode.values) 'control-player-mode-${e.name}': e,
               },
               selected: widget.player.mode,
               onChange: (playerMode) async {
@@ -128,8 +126,7 @@ class _ControlsTabState extends State<ControlsTab>
             EnumTgl<ReleaseMode>(
               key: const Key('control-release-mode'),
               options: {
-                for (final e in ReleaseMode.values)
-                  'control-release-mode-${e.name}': e,
+                for (final e in ReleaseMode.values) 'control-release-mode-${e.name}': e,
               },
               selected: widget.player.releaseMode,
               onChange: (releaseMode) async {
@@ -160,8 +157,7 @@ class _ControlsTabState extends State<ControlsTab>
                       seekDuration: () => _seekDuration(
                         Duration(milliseconds: int.parse(modalInputSeek)),
                       ),
-                      seekPercent: () =>
-                          _seekPercent(double.parse(modalInputSeek)),
+                      seekPercent: () => _seekPercent(double.parse(modalInputSeek)),
                     ),
                   ),
                 );

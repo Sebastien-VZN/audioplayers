@@ -3,10 +3,8 @@ import 'package:audioplayers_platform_interface/src/api/global_audio_event.dart'
 import 'package:audioplayers_platform_interface/src/global_audioplayers_platform.dart';
 import 'package:meta/meta.dart';
 
-abstract class GlobalAudioplayersPlatformInterface
-    implements MethodChannelGlobalAudioplayersPlatformInterface {
-  static GlobalAudioplayersPlatformInterface instance =
-      GlobalAudioplayersPlatform();
+abstract class GlobalAudioplayersPlatformInterface implements MethodChannelGlobalAudioplayersPlatformInterface {
+  static GlobalAudioplayersPlatformInterface instance = GlobalAudioplayersPlatform();
 
   Stream<GlobalAudioEvent> getGlobalEventStream();
 }

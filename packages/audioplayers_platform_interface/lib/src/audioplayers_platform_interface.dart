@@ -17,8 +17,7 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 /// will get the default implementation, while platform implementations that
 /// `implements` this interface will be broken by newly added
 /// [AudioplayersPlatformInterface] methods.
-abstract class AudioplayersPlatformInterface extends PlatformInterface
-    implements MethodChannelAudioplayersPlatformInterface {
+abstract class AudioplayersPlatformInterface extends PlatformInterface implements MethodChannelAudioplayersPlatformInterface {
   AudioplayersPlatformInterface() : super(token: _token);
 
   static final Object _token = Object();

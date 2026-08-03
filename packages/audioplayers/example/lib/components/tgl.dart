@@ -15,9 +15,7 @@ class Tgl extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ToggleButtons(
-      isSelected: options.entries
-          .mapIndexed((index, element) => index == selected)
-          .toList(),
+      isSelected: options.entries.mapIndexed((index, element) => index == selected).toList(),
       onPressed: onChange,
       borderRadius: const BorderRadius.all(Radius.circular(8)),
       selectedBorderColor: Theme.of(context).primaryColor,

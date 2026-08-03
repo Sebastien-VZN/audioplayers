@@ -4,14 +4,12 @@ import 'package:audioplayers_platform_interface/audioplayers_platform_interface.
 import 'package:audioplayers_web/audioplayers_web.dart';
 import 'package:flutter/services.dart';
 
-class WebGlobalAudioplayersPlatform
-    extends GlobalAudioplayersPlatformInterface {
+class WebGlobalAudioplayersPlatform extends GlobalAudioplayersPlatformInterface {
   final _eventStreamController = StreamController<GlobalAudioEvent>.broadcast();
 
   @override
   Future<void> init() async {
-    final instance =
-        AudioplayersPlatformInterface.instance as WebAudioplayersPlatform;
+    final instance = AudioplayersPlatformInterface.instance as WebAudioplayersPlatform;
     await Future.wait(
       instance.players.values.map((player) => player.dispose()),
     );

@@ -13,16 +13,13 @@ class GlobalAudioScope {
   }
   Completer<void>? _initCompleter;
 
-  GlobalAudioplayersPlatformInterface get _platform =>
-      GlobalAudioplayersPlatformInterface.instance;
+  GlobalAudioplayersPlatformInterface get _platform => GlobalAudioplayersPlatformInterface.instance;
 
   /// Stream of global events.
   late final Stream<GlobalAudioEvent> eventStream;
 
   /// Stream of global log events.
-  Stream<String> get onLog => eventStream
-      .where((event) => event.eventType == GlobalAudioEventType.log)
-      .map((event) => event.logMessage!);
+  Stream<String> get onLog => eventStream.where((event) => event.eventType == GlobalAudioEventType.log).map((event) => event.logMessage!);
 
   /// Ensure the global platform is initialized.
   Future<void> ensureInitialized() async {

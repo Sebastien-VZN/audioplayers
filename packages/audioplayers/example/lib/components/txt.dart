@@ -15,8 +15,7 @@ class _TxtBoxState extends State<TxtBox> {
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(text: widget.value)
-      ..addListener(() => widget.onChange(_controller.text));
+    _controller = TextEditingController(text: widget.value)..addListener(() => widget.onChange(_controller.text));
   }
 
   @override

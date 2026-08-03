@@ -37,10 +37,8 @@ class StreamRoute {
     debugPrint('Recording finished');
   }
 
-  Uint8List int32ToBytes(int value) =>
-      Uint8List(4)..buffer.asInt32List()[0] = value;
-  int bytesToInt32(List<int> bytes) =>
-      Uint8List.fromList(bytes).buffer.asInt32List()[0];
+  Uint8List int32ToBytes(int value) => Uint8List(4)..buffer.asInt32List()[0] = value;
+  int bytesToInt32(List<int> bytes) => Uint8List.fromList(bytes).buffer.asInt32List()[0];
   Future<void> playLiveStream() async {
     final client = HttpClient();
     final request = await client.getUrl(Uri.parse(timesRadioUrl));

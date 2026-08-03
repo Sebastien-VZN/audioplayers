@@ -25,9 +25,7 @@ final mp3Url2 = '$host/files/audio/nasa_on_a_mission.mp3';
 final m3u8StreamUrl = useLocalServer
     ? '$host/files/live_streams/nasa_power_of_the_rovers.m3u8'
     : 'https://raw.githubusercontent.com/Sebastien-VZN/audioplayers/main/packages/audioplayers/example/server/public/files/live_streams/nasa_power_of_the_rovers.m3u8';
-final mpgaStreamUrl = useLocalServer
-    ? '$host/stream/mpeg'
-    : 'https://timesradio.wireless.radio/stream';
+final mpgaStreamUrl = useLocalServer ? '$host/stream/mpeg' : 'https://timesradio.wireless.radio/stream';
 
 const wavAsset1 = 'coins.wav';
 const wavAsset2 = 'laser.wav';
@@ -48,8 +46,7 @@ class SourcesTab extends StatefulWidget {
   State<SourcesTab> createState() => _SourcesTabState();
 }
 
-class _SourcesTabState extends State<SourcesTab>
-    with AutomaticKeepAliveClientMixin<SourcesTab> {
+class _SourcesTabState extends State<SourcesTab> with AutomaticKeepAliveClientMixin<SourcesTab> {
   AudioPlayer get player => widget.player;
 
   final List<Widget> sourceWidgets = [];
@@ -227,8 +224,7 @@ class _SourcesTabState extends State<SourcesTab>
           mimeType: 'audio/mpeg',
         ),
         setSourceKey: const Key('setSource-bytes-remote'),
-        play: () =>
-            _setSourceBytesRemote(_play, url: mp3Url1, mimeType: 'audio/mpeg'),
+        play: () => _setSourceBytesRemote(_play, url: mp3Url1, mimeType: 'audio/mpeg'),
         removeSource: _removeSourceWidget,
         title: 'Bytes - Remote',
         subtitle: 'ambient.mp3',
@@ -250,9 +246,7 @@ class _SourcesTabState extends State<SourcesTab>
       alignment: Alignment.bottomCenter,
       children: [
         TabContent(
-          children: sourceWidgets
-              .expand((element) => [element, const Divider()])
-              .toList(),
+          children: sourceWidgets.expand((element) => [element, const Divider()]).toList(),
         ),
         Padding(
           padding: const EdgeInsets.all(16),
@@ -398,12 +392,7 @@ class _SourceDialogState extends State<_SourceDialog> {
     await AssetManifest.loadFromAssetBundle(rootBundle).then((assetManifest) {
       setState(() {
         assetsList.addAll(
-          assetManifest
-              .listAssets()
-              .map((e) => e.replaceFirst('assets/', ''))
-              .toList()
-              .asMap()
-              .map((key, value) => MapEntry(value, value)),
+          assetManifest.listAssets().map((e) => e.replaceFirst('assets/', '')).toList().asMap().map((key, value) => MapEntry(value, value)),
         );
       });
     });

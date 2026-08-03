@@ -26,8 +26,7 @@ class AudioPlayer {
   static final global = GlobalAudioScope();
   static Duration preparationTimeout = const Duration(seconds: 30);
   static Duration seekingTimeout = const Duration(seconds: 30);
-  final AudioplayersPlatformInterface _platform =
-      AudioplayersPlatformInterface.instance;
+  final AudioplayersPlatformInterface _platform = AudioplayersPlatformInterface.instance;
 
   /// This is the [AudioCache] instance used by this player.
   /// Unless you want to control multiple caches separately, you don't need to
@@ -104,8 +103,7 @@ class AudioPlayer {
 
   Stream<AudioEvent> get eventStream => _eventStreamController.stream;
 
-  final StreamController<PlayerState> _playerStateController =
-      StreamController<PlayerState>.broadcast();
+  final StreamController<PlayerState> _playerStateController = StreamController<PlayerState>.broadcast();
 
   /// Stream of changes on player state.
   Stream<PlayerState> get onPlayerStateChanged => _playerStateController.stream;
@@ -116,16 +114,13 @@ class AudioPlayer {
   /// position of the playback if the status is [PlayerState.playing].
   ///
   /// You can use it on a progress bar, for instance.
-  Stream<Duration> get onPositionChanged =>
-      _positionUpdater?.positionStream ?? const Stream.empty();
+  Stream<Duration> get onPositionChanged => _positionUpdater?.positionStream ?? const Stream.empty();
 
   /// Stream of changes on audio duration.
   ///
   /// An event is going to be sent as soon as the audio duration is available
   /// (it might take a while to download or buffer it).
-  Stream<Duration> get onDurationChanged => eventStream
-      .where((event) => event.eventType == AudioEventType.duration)
-      .map((event) => event.duration!);
+  Stream<Duration> get onDurationChanged => eventStream.where((event) => event.eventType == AudioEventType.duration).map((event) => event.duration!);
 
   /// Stream of player completions.
   ///
@@ -133,8 +128,7 @@ class AudioPlayer {
   /// sent when an audio is paused or stopped.
   ///
   /// [ReleaseMode.loop] also sends events to this stream.
-  Stream<void> get onPlayerComplete =>
-      eventStream.where((event) => event.eventType == AudioEventType.complete);
+  Stream<void> get onPlayerComplete => eventStream.where((event) => event.eventType == AudioEventType.complete);
 
   /// Stream of seek completions.
   ///
@@ -143,20 +137,15 @@ class AudioPlayer {
     (event) => event.eventType == AudioEventType.seekComplete,
   );
 
-  Stream<bool> get _onPrepared => eventStream
-      .where((event) => event.eventType == AudioEventType.prepared)
-      .map((event) => event.isPrepared!);
+  Stream<bool> get _onPrepared => eventStream.where((event) => event.eventType == AudioEventType.prepared).map((event) => event.isPrepared!);
 
   /// Stream of log events.
-  Stream<String> get onLog => eventStream
-      .where((event) => event.eventType == AudioEventType.log)
-      .map((event) => event.logMessage!);
+  Stream<String> get onLog => eventStream.where((event) => event.eventType == AudioEventType.log).map((event) => event.logMessage!);
 
   Future<void> _init() async {
     _onLogStreamSubscription = onLog.listen(
       (log) => AudioLogger.log('$log\nSource: $_source'),
-      onError: (Object e, [StackTrace? stackTrace]) =>
-          AudioLogger.error(AudioPlayerException(this, cause: e), stackTrace),
+      onError: (Object e, [StackTrace? stackTrace]) => AudioLogger.error(AudioPlayerException(this, cause: e), stackTrace),
     );
 
     _onPlayerCompleteStreamSubscription = onPlayerComplete.listen(
@@ -382,9 +371,7 @@ class AudioPlayer {
     _positionUpdater?.start();
 
     try {
-      final preparedFuture = _onPrepared
-          .firstWhere((isPrepared) => isPrepared)
-          .timeout(AudioPlayer.preparationTimeout);
+      final preparedFuture = _onPrepared.firstWhere((isPrepared) => isPrepared).timeout(AudioPlayer.preparationTimeout);
       // Need to await the setting the source to propagate immediate errors.
       final setSourceFuture = setSource();
 
@@ -405,9 +392,7 @@ class AudioPlayer {
   /// The resources will start being fetched or buffered as soon as you call
   /// this method.
   Future<void> setSourceUrl(String url, {String? mimeType}) async {
-    if (!kIsWeb &&
-        defaultTargetPlatform != TargetPlatform.android &&
-        url.startsWith('data:')) {
+    if (!kIsWeb && defaultTargetPlatform != TargetPlatform.android && url.startsWith('data:')) {
       // Convert data URI's to bytes (native support for web and android).
       final uriData = UriData.fromUri(Uri.parse(url));
       mimeType ??= url.substring(url.indexOf(':') + 1, url.indexOf(';'));

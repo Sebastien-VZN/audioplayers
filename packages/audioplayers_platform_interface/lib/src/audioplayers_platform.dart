@@ -9,8 +9,7 @@ import 'package:audioplayers_platform_interface/src/map_extension.dart';
 import 'package:audioplayers_platform_interface/src/method_channel_extension.dart';
 import 'package:flutter/services.dart';
 
-class AudioplayersPlatform extends AudioplayersPlatformInterface
-    with MethodChannelAudioplayersPlatform, EventChannelAudioplayersPlatform {
+class AudioplayersPlatform extends AudioplayersPlatformInterface with MethodChannelAudioplayersPlatform, EventChannelAudioplayersPlatform {
   AudioplayersPlatform();
 
   @override
@@ -26,8 +25,7 @@ class AudioplayersPlatform extends AudioplayersPlatformInterface
   }
 }
 
-mixin MethodChannelAudioplayersPlatform
-    implements MethodChannelAudioplayersPlatformInterface {
+mixin MethodChannelAudioplayersPlatform implements MethodChannelAudioplayersPlatformInterface {
   static const MethodChannel _methodChannel = MethodChannel(
     'xyz.luan/audioplayers',
   );
@@ -189,8 +187,7 @@ mixin EventChannelAudioplayersPlatform {
           final millis = map.getInt('value');
           return AudioEvent(
             eventType: AudioEventType.duration,
-            duration:
-                millis != null ? Duration(milliseconds: millis) : Duration.zero,
+            duration: millis != null ? Duration(milliseconds: millis) : Duration.zero,
           );
         case 'audio.onComplete':
           return const AudioEvent(eventType: AudioEventType.complete);

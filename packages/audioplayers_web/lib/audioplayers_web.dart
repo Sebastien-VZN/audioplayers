@@ -11,8 +11,7 @@ class AudioplayersPlugin {
   /// The entrypoint called by the generated plugin registrant.
   static void registerWith(Registrar registrar) {
     AudioplayersPlatformInterface.instance = WebAudioplayersPlatform();
-    GlobalAudioplayersPlatformInterface.instance =
-        WebGlobalAudioplayersPlatform();
+    GlobalAudioplayersPlatformInterface.instance = WebGlobalAudioplayersPlatform();
   }
 }
 
@@ -30,8 +29,7 @@ class WebAudioplayersPlatform extends AudioplayersPlatformInterface {
         ? players[playerId]!
         : throw PlatformException(
             code: 'WebAudioError',
-            message:
-                'Player has not yet been created or has already been disposed.',
+            message: 'Player has not yet been created or has already been disposed.',
           );
   }
 
@@ -79,11 +77,11 @@ class WebAudioplayersPlatform extends AudioplayersPlatformInterface {
     AudioContext audioContext,
   ) async {
     getPlayer(playerId).eventStreamController.add(
-          const AudioEvent(
-            eventType: AudioEventType.log,
-            logMessage: 'Setting AudioContext is not supported on Web',
-          ),
-        );
+      const AudioEvent(
+        eventType: AudioEventType.log,
+        logMessage: 'Setting AudioContext is not supported on Web',
+      ),
+    );
   }
 
   @override
@@ -145,8 +143,8 @@ class WebAudioplayersPlatform extends AudioplayersPlatformInterface {
   @override
   Future<void> emitError(String playerId, String code, String message) async {
     getPlayer(playerId).eventStreamController.addError(
-          PlatformException(code: code, message: message),
-        );
+      PlatformException(code: code, message: message),
+    );
   }
 
   @override

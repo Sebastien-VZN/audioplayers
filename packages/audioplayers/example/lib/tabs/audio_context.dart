@@ -17,8 +17,7 @@ class AudioContextTab extends StatefulWidget {
   AudioContextTabState createState() => AudioContextTabState();
 }
 
-class AudioContextTabState extends State<AudioContextTab>
-    with AutomaticKeepAliveClientMixin<AudioContextTab> {
+class AudioContextTabState extends State<AudioContextTab> with AutomaticKeepAliveClientMixin<AudioContextTab> {
   static GlobalAudioScope get _global => AudioPlayer.global;
 
   AudioPlayer get player => widget.player;
@@ -158,8 +157,7 @@ class AudioContextTabState extends State<AudioContextTab>
         Cbx(
           'Respect Silence',
           value: audioContextConfig.respectSilence,
-          ({value}) =>
-              updateConfig(audioContextConfig.copy(respectSilence: value)),
+          ({value}) => updateConfig(audioContextConfig.copy(respectSilence: value)),
         ),
         Cbx(
           'Stay Awake',
@@ -251,8 +249,7 @@ class AudioContextTabState extends State<AudioContextTab>
           label: 'category',
           options: {for (final e in AVAudioSessionCategory.values) e: e.name},
           selected: audioContext.iOS.category,
-          onChange: (v) =>
-              updateAudioContextIOS(() => audioContext.iOS.copy(category: v)),
+          onChange: (v) => updateAudioContextIOS(() => audioContext.iOS.copy(category: v)),
         ),
         ...iosOptions,
       ],

@@ -19,10 +19,7 @@ class GlobalAudioEvent {
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        other is GlobalAudioEvent &&
-            runtimeType == other.runtimeType &&
-            eventType == other.eventType &&
-            logMessage == other.logMessage;
+        other is GlobalAudioEvent && runtimeType == other.runtimeType && eventType == other.eventType && logMessage == other.logMessage;
   }
 
   @override

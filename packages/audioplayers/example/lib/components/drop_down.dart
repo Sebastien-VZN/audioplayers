@@ -47,8 +47,7 @@ class CustomDropDown<T> extends StatelessWidget {
       onChanged: onChange,
       items: options.entries
           .map<DropdownMenuItem<T>>(
-            (entry) =>
-                DropdownMenuItem<T>(value: entry.key, child: Text(entry.value)),
+            (entry) => DropdownMenuItem<T>(value: entry.key, child: Text(entry.value)),
           )
           .toList(),
     );

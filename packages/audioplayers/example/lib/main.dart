@@ -138,9 +138,7 @@ class _ExampleAppState extends State<_ExampleApp> {
                 return PopupMenuItem<PopupAction>(
                   value: choice,
                   child: Text(
-                    choice == PopupAction.add
-                        ? 'Add player'
-                        : 'Remove selected player',
+                    choice == PopupAction.add ? 'Add player' : 'Remove selected player',
                   ),
                 );
               }).toList();
