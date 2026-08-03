@@ -14,8 +14,32 @@ jobs:
       actions: write
     steps:
       - name: "Purger les artifacts de plus de 30 jours"
-        uses: c-hive/gha-remove-artifacts@ca9712b
+        uses: actions/github-script@v7
         with:
-          age: '1 month'
-          skip-tags: true
-          skip-recent: 2
+          script: |
+            const MAX_AGE_DAYS = 30;
+            const cutoff = new Date(Date.now() - MAX_AGE_DAYS * 24 * 60 * 60 * 1000);
+
+            const artifacts = await github.paginate(
+              github.rest.actions.listArtifactsForRepo, {
+                owner: context.repo.owner,
+                repo: context.repo.repo
+              }
+            );
+
+            let deleted = 0;
+            for (const artifact of artifacts) {
+              const created = new Date(artifact.created_at);
+              if (created < cutoff) {
+                console.log(`Suppression: ${artifact.name} (#${artifact.id}), créé le ${artifact.created_at}`);
+                await github.rest.actions.deleteArtifact({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  artifact_id: artifact.id
+                });
+                deleted++;
+              } else {
+                console.log(`Conservé: ${artifact.name} (#${artifact.id}), créé le ${artifact.created_at}`);
+              }
+            }
+            console.log(`Supprimé: ${deleted} / ${artifacts.length} artifacts.`);
