@@ -1,3 +1,112 @@
+## 6.9.0
+
+ - **FEAT**(android): Migrate to Flutter 3.47.1 Android matrix — AGP 9.1.0, KGP 2.4.0, Gradle 9.3.1. ([457d8df])
+ - **FIX**(android): Remove AGP and kotlin-gradle-plugin from the plugin buildscript classpath so the host app provides them. Keeps the plugin consumable by apps on AGP 8 as well as AGP 9. ([457d8df])
+ - **CHORE**(android): Pin `kotlin-stdlib-jdk7` to 2.4.0 directly. ([457d8df])
+ - **CHORE**(android): Opt out of AGP 9 Built-in Kotlin and new DSL via `android.builtInKotlin=false` and `android.newDsl=false`, aligned with the official Flutter 3.47 template. AGP 9.1.0 bundles Kotlin 2.2.0 which is lower than Flutter's minimum (2.2.20). ([457d8df])
+ - **FEAT**: Bump audioplayers to 6.9.0, audioplayers_android to 5.5.0. ([457d8df])
+
+> Note: Flutter emits a warning because this plugin still applies the Kotlin Gradle Plugin (KGP). Migrating to Built-in Kotlin is not viable on Flutter 3.47.1 (AGP 9.1 bundles Kotlin 2.2.0 < Flutter minimum 2.2.20). The warning is expected to disappear once a future AGP ships Kotlin >= 2.2.20.
+
+## 6.8.8
+
+ - **FIX**(android): Apply AGP 9.3.1 to `audioplayers_android` only; example kept on AGP 8.13.2 because the `file_picker` plugin is incompatible with AGP 9. ([08a7bdf])
+ - **CHORE**: Add `analysis_options` entries across all packages. ([80fc758])
+ - **FEAT**: Bump to 6.8.8. ([80fc758])
+
+## 6.8.7
+
+ - **FIX**(android): Fix android package — `gradle.properties`, `gradle-wrapper`, `settings.gradle.kts`. ([bc4389a])
+ - **FEAT**: Bump to 6.8.7, audioplayers_android to 5.4.0. ([fe5d98d])
+
+## 6.8.6
+
+ - **CHORE**: Harden `analysis_options.yaml` across all packages with `very_good_analysis`; add `devtools_options.yaml`. ([66c70ea])
+ - **REFACTOR**: Lint compliance across `audio_context*.dart`, platform interface files, `wrapped_player.dart`. ([9c35eba])
+ - **FIX**: Fix SDK version constraints across all platform pubspecs; refactor `audioplayer.dart` and example server. ([194a026])
+ - **CI**: Trim `build_check.yml` and simplify `purge_artifacts.yml`. ([ba1c372])
+ - **CHORE**: Reformat all Dart files to 150-column line length (28 files). ([495a780])
+ - **FEAT**: Bump to 6.8.6, audioplayers_android to 5.3.5. ([194a026])
+
+## 6.8.5
+
+ - **CHORE**: Update Flutter pub dependencies and workspace config. ([6491180])
+ - **FEAT**: Bump to 6.8.5. ([6491180])
+
+## 6.8.4
+
+ - **CHORE**: Sync fork upstream (strategy ours — keep all local changes). Explicitly rejected 6 upstream commits as redundant or over-engineering: `PlayingStateUpdate` event #1995, `ReleaseMode.release` Dart refactor #2017, Windows-N Media Feature Pack #2019 (fork's global try-catch already covers it), and 3 cosmetic CI/test commits. ([fe92818])
+ - **FEAT**: Bump to 6.8.4. ([19ebec5])
+
+## 6.8.3
+
+ - **FEAT**(android): Upgrade Kotlin 2.1.0 -> 2.3.10 (example + android plugin), Gradle wrapper -> 8.14.5. ([b59d694])
+ - **FEAT**: Bump to 6.8.3, audioplayers_android to 5.3.4. ([b59d694])
+
+## 6.8.2
+
+ - **FIX**(windows): Catch errors when no audio device is available — `wil::ResultException` no longer crashes the app when MediaFoundation finds no audio renderer. Global try-catch in `HandleMethodCall` (Linux pattern); STA deadlock fix in `RunSyncInMTA`. ([2aab838])
+ - **TEST**(windows): Add native C++ and Dart mock tests for no-audio-device scenario (#1979). ([1588169])
+ - **FIX**: Fix resume player error catching in `audioplayer.dart`. ([9d6b960])
+ - **CHORE**: Sync fork upstream (brought in VS2026 compat #2011, `_completePrepared` StateError fix #2010). ([59163d5])
+ - **FEAT**: Bump to 6.8.2. ([f6fec71])
+
+## 6.7.2
+
+ - **FIX**(windows): Align Windows plugin to C++23 and refactor `Error()` API across `audioplayers_windows_plugin.cpp`, `audio_player.cpp/.h`, `event_stream_handler.h`. Fork-specific variant of upstream #2004. ([a510d57])
+ - **CHORE**: Sync fork upstream (strategy ours). ([c849789])
+ - **FEAT**: Bump to 6.7.2. ([d4dce1f])
+
+## 6.7.1
+
+ - **CHORE**: Sync fork upstream (strategy ours — keep all local changes). Absorbed upstream commits but preserved all fork modifications. ([7d7feac])
+ - **FEAT**: Bump to 6.7.1. ([d3dd0ff])
+
+## 6.6.5
+
+ - **FEAT**: Selective sync of upstream v6.7.0 — cherry-picked 5 fixes: Web Safari volume via `GainNode` (#1978), ExoPlayer mono-volume `ChannelMixingMatrix` (#1987), AudioCache `existsSync()` on all platforms (#1980), `AudioPool.getDuration()` (#1954), Web excluded from cache re-check (#1993). Kept AGP 8.13.2 (refused AGP 9.x), kept Windows `PlatformThreadHelper` (refused #1970). ([cf99590])
+ - **FIX**: AudioCache cache-check fix + example plugin registration. ([41f4e4e])
+ - **FIX**(example): Fix FilePicker in `sources.dart`. ([058573d])
+ - **CI**: Windows CI/CD build hardening — action versions, WIL, coroutine warning silencing, artifact retention. ([17cb5c6], [c93de26], [3a73da6])
+ - **FEAT**: Bump to 6.6.5. ([c93de26])
+
+## 6.6.4
+
+ - **REFACTOR**: Migrate linting from `flutter_lints` to `very_good_analysis` (strict-casts, strict-inference, strict-raw-types). ([bf8eb99])
+ - **CI**: Add automated GitHub Release pipeline — extracts version from pubspec, creates tag, uploads build artifacts for all platforms. ([bf8eb99])
+ - **CHORE**: Enforce LF line endings via `.gitattributes`. ([bf8eb99])
+ - **FEAT**: Bump to 6.6.4. ([bf8eb99])
+
+## 6.6.3
+
+ - **CHORE**: Version bump and README update. ([5d35a0a])
+ - **FEAT**: Bump to 6.6.3, audioplayers_android to 5.3.3. ([5d35a0a])
+
+## 6.6.2
+
+ - **REFACTOR**: Remove `flame_lint` dependency across all packages; clean up changelogs. ([7a89780])
+ - **FIX**: Fix `audio_pool.dart` unawaited future and async build error. ([08ebee8], [5c877c1])
+ - **FEAT**(android): Upgrade Gradle to 8.13 and AGP to 8.13.2, Kotlin 2.1.0, Java 17 toolchain, foojay-resolver, JUnit5 1.11.0.0. ([026f964])
+ - **FEAT**: Bump to 6.6.2. ([7a89780])
+
+## 6.6.1
+
+ - **FEAT**(android): Migrate to ExoPlayer (`androidx.media3:exoplayer`) and unify Android implementation. Merged `audioplayers_android_exo` into `audioplayers_android` and deleted the `_exo` package. Removed obsolete `MediaPlayerWrapper`, `SoundPoolPlayer`, `SoundPoolManager`, `PlayerMode`. minSdk 26. (-2528 lines.) ([1dbcddd])
+ - **TEST**: Add robust unit tests for `AudioPlayer` using `mocktail`. ([71ccdee])
+ - **BUILD**: Lock all dependencies to local fork via relative `path:` references; `publish_to: none` on all packages; enforce Android API 26. ([9160473])
+ - **REFACTOR**: Remove TODO comments and improve native error logging in Linux/Windows/Darwin. ([79ffffb])
+ - **DOCS**: Centralize README, remove per-package READMEs, update `feature_parity_table.md` and `getting_started.md`. ([be830e3], [f0b9d07], [7524c37])
+ - **FEAT**: Bump to 6.6.1, audioplayers_android to 5.3.1. ([1dbcddd])
+
+## 6.6.0
+
+ - **CHORE**: Unify CI into `build_check.yml`, remove Melos and unstable Bluefire integration tests. ([113bfba], [6175a9a])
+ - **CHORE**: Remove redundant `audioplayers_android` example app. ([113bfba])
+ - **FEAT**: Harden Darwin/Linux/Web/Windows native plugins; AudioCache and AudioPool improvements. ([113bfba])
+ - **FIX**(web): Rewrite `audioplayers_web/lib/wrapped_player.dart` to fix web wrapper error. ([44b1403])
+ - **CI**: Add test builds for web, iOS, macOS. ([7733ea5])
+ - **DOCS**: Clean up README by removing fork philosophy details. ([5f291f4])
+
 ## 6.5.1
 
  - **FIX**: Initialize audioplayer instances sequentially (#1941). ([663fff2c])

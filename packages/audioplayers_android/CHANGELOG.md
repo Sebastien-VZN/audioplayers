@@ -1,3 +1,35 @@
+## 5.5.0
+
+ - **FEAT**(android): Migrate to Flutter 3.47.1 Android matrix — AGP 9.1.0, KGP 2.4.0, Gradle 9.3.1. ([457d8df])
+ - **FIX**(android): Remove AGP and kotlin-gradle-plugin from the plugin buildscript classpath so the host app provides them. Keeps the plugin consumable by apps on AGP 8 as well as AGP 9. ([457d8df])
+ - **CHORE**(android): Pin `kotlin-stdlib-jdk7` to 2.4.0 directly. ([457d8df])
+ - **CHORE**(android): Opt out of AGP 9 Built-in Kotlin and new DSL via `android.builtInKotlin=false` and `android.newDsl=false`, aligned with the official Flutter 3.47 template. AGP 9.1.0 bundles Kotlin 2.2.0 which is lower than Flutter's minimum (2.2.20). ([457d8df])
+
+> Note: Flutter emits a warning because this plugin still applies the Kotlin Gradle Plugin (KGP). Migrating to Built-in Kotlin is not viable on Flutter 3.47.1 (AGP 9.1 bundles Kotlin 2.2.0 < Flutter minimum 2.2.20). The warning is expected to disappear once a future AGP ships Kotlin >= 2.2.20.
+
+## 5.4.0
+
+ - **FIX**(android): Fix android package — `gradle.properties`, `gradle-wrapper`, `settings.gradle.kts`. ([bc4389a])
+ - **FIX**(android): Apply AGP 9.3.1 to `audioplayers_android` only; example kept on AGP 8.13.2 because the `file_picker` plugin is incompatible with AGP 9. ([08a7bdf])
+
+## 5.3.5
+
+ - **FIX**: Fix SDK version constraints in pubspec; refactor `audioplayer.dart`. ([194a026])
+
+## 5.3.4
+
+ - **FEAT**(android): Upgrade Kotlin 2.1.0 -> 2.3.10, Gradle wrapper -> 8.14.5. ([b59d694])
+
+## 5.3.3
+
+ - **CHORE**: Version bump and README update. ([5d35a0a])
+
+## 5.3.1
+
+ - **FEAT**(android): Migrate to ExoPlayer (`androidx.media3:exoplayer`) and unify Android implementation. Merged `audioplayers_android_exo` into `audioplayers_android` and deleted the `_exo` package. Removed obsolete `MediaPlayerWrapper`, `SoundPoolPlayer`, `SoundPoolManager`, `PlayerMode`. minSdk 26. (-2528 lines.) ([1dbcddd])
+ - **BUILD**(android): Lock all dependencies to local fork via relative `path:` references; enforce Android API 26. ([9160473])
+ - **FEAT**(android): Upgrade Gradle to 8.13 and AGP to 8.13.2, Kotlin 2.1.0, Java 17 toolchain, foojay-resolver, JUnit5 1.11.0.0. ([026f964])
+
 ## 5.2.1
 
  - **FIX**: Migrate to Melos v7 and Pub Workspaces ([#1929]). ([9d0bfe0b])
