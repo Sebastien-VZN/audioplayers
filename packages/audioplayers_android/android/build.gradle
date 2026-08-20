@@ -2,7 +2,6 @@ group 'xyz.luan.audioplayers'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '2.3.10'
     ext.coroutines_version = '1.10.2'
 
     repositories {
@@ -11,8 +10,6 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:9.3.1'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "de.mannodermaus.gradle.plugins:android-junit5:1.11.0.0"
     }
 }
@@ -76,7 +73,7 @@ dependencies {
     implementation "androidx.media3:media3-exoplayer-smoothstreaming:${exoplayer_version}"
 
     implementation 'androidx.core:core-ktx:1.17.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.4.0'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     testImplementation 'org.junit.jupiter:junit-jupiter:6.0.1'
