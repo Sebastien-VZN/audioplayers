@@ -2,12 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 class Tgl extends StatelessWidget {
-  const Tgl({
-    required this.options,
-    required this.selected,
-    required this.onChange,
-    super.key,
-  });
+  const Tgl({required this.options, required this.selected, required this.onChange, super.key});
   final Map<String, String> options;
   final int selected;
   final void Function(int) onChange;
@@ -32,12 +27,7 @@ class Tgl extends StatelessWidget {
 }
 
 class EnumTgl<T extends Enum> extends StatelessWidget {
-  const EnumTgl({
-    required this.options,
-    required this.selected,
-    required this.onChange,
-    super.key,
-  });
+  const EnumTgl({required this.options, required this.selected, required this.onChange, super.key});
   final Map<String, T> options;
   final T selected;
   final void Function(T) onChange;

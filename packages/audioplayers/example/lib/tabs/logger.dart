@@ -34,12 +34,7 @@ class LoggerTabState extends State<LoggerTab> with AutomaticKeepAliveClientMixin
       onError: (Object o, [StackTrace? stackTrace]) {
         if (AudioLogLevel.error.level <= currentLogLevel.level) {
           setState(() {
-            globalLogs.add(
-              Log(
-                AudioLogger.errorToString(o, stackTrace),
-                level: AudioLogLevel.error,
-              ),
-            );
+            globalLogs.add(Log(AudioLogger.errorToString(o, stackTrace), level: AudioLogLevel.error));
           });
         }
       },
@@ -56,15 +51,7 @@ class LoggerTabState extends State<LoggerTab> with AutomaticKeepAliveClientMixin
       onError: (Object o, [StackTrace? stackTrace]) {
         if (AudioLogLevel.error.level <= currentLogLevel.level) {
           setState(() {
-            logs.add(
-              Log(
-                AudioLogger.errorToString(
-                  AudioPlayerException(widget.player, cause: o),
-                  stackTrace,
-                ),
-                level: AudioLogLevel.error,
-              ),
-            );
+            logs.add(Log(AudioLogger.errorToString(AudioPlayerException(widget.player, cause: o), stackTrace), level: AudioLogLevel.error));
           });
         }
       },
@@ -78,10 +65,7 @@ class LoggerTabState extends State<LoggerTab> with AutomaticKeepAliveClientMixin
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          ListTile(
-            title: Text(currentLogLevel.toString()),
-            subtitle: const Text('Log Level'),
-          ),
+          ListTile(title: Text(currentLogLevel.toString()), subtitle: const Text('Log Level')),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: AudioLogLevel.values
@@ -125,12 +109,7 @@ class LoggerTabState extends State<LoggerTab> with AutomaticKeepAliveClientMixin
 }
 
 class LogView extends StatelessWidget {
-  const LogView({
-    required this.logs,
-    required this.title,
-    required this.onDelete,
-    super.key,
-  });
+  const LogView({required this.logs, required this.title, required this.onDelete, super.key});
   final String title;
   final List<Log> logs;
   final VoidCallback onDelete;

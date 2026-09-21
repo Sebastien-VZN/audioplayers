@@ -29,10 +29,7 @@ class _ControlsTabState extends State<ControlsTab> with AutomaticKeepAliveClient
   Future<void> _seekPercent(double percent) async {
     final duration = await widget.player.getDuration();
     if (duration == null) {
-      toast(
-        'Failed to get duration for proportional seek.',
-        textKey: const Key('toast-proportional-seek-duration-null'),
-      );
+      toast('Failed to get duration for proportional seek.', textKey: const Key('toast-proportional-seek-duration-null'));
       return;
     }
     final position = duration * percent;
@@ -50,59 +47,31 @@ class _ControlsTabState extends State<ControlsTab> with AutomaticKeepAliveClient
       children: [
         WrappedListTile(
           children: [
-            Btn(
-              key: const Key('control-pause'),
-              txt: 'Pause',
-              onPressed: widget.player.pause,
-            ),
-            Btn(
-              key: const Key('control-stop'),
-              txt: 'Stop',
-              onPressed: widget.player.stop,
-            ),
-            Btn(
-              key: const Key('control-resume'),
-              txt: 'Resume',
-              onPressed: widget.player.resume,
-            ),
-            Btn(
-              key: const Key('control-release'),
-              txt: 'Release',
-              onPressed: widget.player.release,
-            ),
+            Btn(key: const Key('control-pause'), txt: 'Pause', onPressed: widget.player.pause),
+            Btn(key: const Key('control-stop'), txt: 'Stop', onPressed: widget.player.stop),
+            Btn(key: const Key('control-resume'), txt: 'Resume', onPressed: widget.player.resume),
+            Btn(key: const Key('control-release'), txt: 'Release', onPressed: widget.player.release),
           ],
         ),
         WrappedListTile(
           leading: const Text('Volume'),
           children: [0.0, 0.5, 1.0, 2.0].map((it) {
             final formattedVal = it.toStringAsFixed(1);
-            return Btn(
-              key: Key('control-volume-$formattedVal'),
-              txt: formattedVal,
-              onPressed: () => widget.player.setVolume(it),
-            );
+            return Btn(key: Key('control-volume-$formattedVal'), txt: formattedVal, onPressed: () => widget.player.setVolume(it));
           }).toList(),
         ),
         WrappedListTile(
           leading: const Text('Balance'),
           children: [-1.0, -0.5, 0.0, 1.0].map((it) {
             final formattedVal = it.toStringAsFixed(1);
-            return Btn(
-              key: Key('control-balance-$formattedVal'),
-              txt: formattedVal,
-              onPressed: () => widget.player.setBalance(it),
-            );
+            return Btn(key: Key('control-balance-$formattedVal'), txt: formattedVal, onPressed: () => widget.player.setBalance(it));
           }).toList(),
         ),
         WrappedListTile(
           leading: const Text('Rate'),
           children: [0.0, 0.5, 1.0, 2.0].map((it) {
             final formattedVal = it.toStringAsFixed(1);
-            return Btn(
-              key: Key('control-rate-$formattedVal'),
-              txt: formattedVal,
-              onPressed: () => widget.player.setPlaybackRate(it),
-            );
+            return Btn(key: Key('control-rate-$formattedVal'), txt: formattedVal, onPressed: () => widget.player.setPlaybackRate(it));
           }).toList(),
         ),
         WrappedListTile(
@@ -110,9 +79,7 @@ class _ControlsTabState extends State<ControlsTab> with AutomaticKeepAliveClient
           children: [
             EnumTgl<PlayerMode>(
               key: const Key('control-player-mode'),
-              options: {
-                for (final e in PlayerMode.values) 'control-player-mode-${e.name}': e,
-              },
+              options: {for (final e in PlayerMode.values) 'control-player-mode-${e.name}': e},
               selected: widget.player.mode,
               onChange: (playerMode) async {
                 await _update(() => widget.player.setPlayerMode(playerMode));
@@ -125,9 +92,7 @@ class _ControlsTabState extends State<ControlsTab> with AutomaticKeepAliveClient
           children: [
             EnumTgl<ReleaseMode>(
               key: const Key('control-release-mode'),
-              options: {
-                for (final e in ReleaseMode.values) 'control-release-mode-${e.name}': e,
-              },
+              options: {for (final e in ReleaseMode.values) 'control-release-mode-${e.name}': e},
               selected: widget.player.releaseMode,
               onChange: (releaseMode) async {
                 await _update(() => widget.player.setReleaseMode(releaseMode));
@@ -140,11 +105,7 @@ class _ControlsTabState extends State<ControlsTab> with AutomaticKeepAliveClient
           children: [
             ...[0.0, 0.5, 1.0].map((it) {
               final formattedVal = it.toStringAsFixed(1);
-              return Btn(
-                key: Key('control-seek-$formattedVal'),
-                txt: formattedVal,
-                onPressed: () => _seekPercent(it),
-              );
+              return Btn(key: Key('control-seek-$formattedVal'), txt: formattedVal, onPressed: () => _seekPercent(it));
             }),
             Btn(
               txt: 'Custom',
@@ -154,9 +115,7 @@ class _ControlsTabState extends State<ControlsTab> with AutomaticKeepAliveClient
                     _SeekDialog(
                       value: modalInputSeek,
                       setValue: (it) => setState(() => modalInputSeek = it),
-                      seekDuration: () => _seekDuration(
-                        Duration(milliseconds: int.parse(modalInputSeek)),
-                      ),
+                      seekDuration: () => _seekDuration(Duration(milliseconds: int.parse(modalInputSeek))),
                       seekPercent: () => _seekPercent(double.parse(modalInputSeek)),
                     ),
                   ),
@@ -174,12 +133,7 @@ class _ControlsTabState extends State<ControlsTab> with AutomaticKeepAliveClient
 }
 
 class _SeekDialog extends StatelessWidget {
-  const _SeekDialog({
-    required this.seekDuration,
-    required this.seekPercent,
-    required this.value,
-    required this.setValue,
-  });
+  const _SeekDialog({required this.seekDuration, required this.seekPercent, required this.value, required this.setValue});
   final VoidCallback seekDuration;
   final VoidCallback seekPercent;
   final void Function(String val) setValue;
@@ -216,10 +170,7 @@ class _SeekDialog extends StatelessWidget {
                 seekPercent();
               },
             ),
-            TextButton(
-              onPressed: Navigator.of(context).pop,
-              child: const Text('Cancel'),
-            ),
+            TextButton(onPressed: Navigator.of(context).pop, child: const Text('Cancel')),
           ],
         ),
       ],

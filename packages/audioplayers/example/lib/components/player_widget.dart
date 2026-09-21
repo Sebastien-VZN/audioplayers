@@ -126,9 +126,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   return;
                 }
                 final position = value * duration.inMilliseconds;
-                unawaited(
-                  player.seek(Duration(milliseconds: position.round())),
-                );
+                unawaited(player.seek(Duration(milliseconds: position.round())));
               },
               value:
                   (_position != null && _duration != null && _position!.inMilliseconds > 0 && _position!.inMilliseconds < _duration!.inMilliseconds)
@@ -154,9 +152,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       setState(() => _duration = duration);
     });
 
-    _positionSubscription = player.onPositionChanged.listen(
-      (p) => setState(() => _position = p),
-    );
+    _positionSubscription = player.onPositionChanged.listen((p) => setState(() => _position = p));
 
     _playerCompleteSubscription = player.onPlayerComplete.listen((event) {
       setState(() {
@@ -165,9 +161,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       });
     });
 
-    _playerStateChangeSubscription = player.onPlayerStateChanged.listen((
-      state,
-    ) {
+    _playerStateChangeSubscription = player.onPlayerStateChanged.listen((state) {
       setState(() {
         _playerState = state;
       });

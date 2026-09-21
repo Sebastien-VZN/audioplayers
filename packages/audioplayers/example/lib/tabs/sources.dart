@@ -54,16 +54,10 @@ class _SourcesTabState extends State<SourcesTab> with AutomaticKeepAliveClientMi
   Future<void> _setSource(Source source) async {
     try {
       await player.setSource(source);
-      toast(
-        'Completed setting source.',
-        textKey: const Key('toast-set-source'),
-      );
+      toast('Completed setting source.', textKey: const Key('toast-set-source'));
     } on Exception catch (e, stackTrace) {
       AudioLogger.error(e, stackTrace);
-      toast(
-        'Error setting source: $e',
-        textKey: const Key('toast-error-set-source'),
-      );
+      toast('Error setting source: $e', textKey: const Key('toast-error-set-source'));
     }
   }
 
@@ -103,37 +97,23 @@ class _SourcesTabState extends State<SourcesTab> with AutomaticKeepAliveClientMi
     buttonColor: buttonColor,
   );
 
-  Future<void> _setSourceBytesAsset(
-    Future<void> Function(Source) fun, {
-    required String asset,
-    String? mimeType,
-  }) async {
+  Future<void> _setSourceBytesAsset(Future<void> Function(Source) fun, {required String asset, String? mimeType}) async {
     try {
       final bytes = await AudioCache.instance.loadAsBytes(asset);
       await fun(BytesSource(bytes, mimeType: mimeType));
     } on Exception catch (e, stackTrace) {
       AudioLogger.error(e, stackTrace);
-      toast(
-        'Error loading bytes from asset: $e',
-        textKey: const Key('toast-error-bytes-asset'),
-      );
+      toast('Error loading bytes from asset: $e', textKey: const Key('toast-error-bytes-asset'));
     }
   }
 
-  Future<void> _setSourceBytesRemote(
-    Future<void> Function(Source) fun, {
-    required String url,
-    String? mimeType,
-  }) async {
+  Future<void> _setSourceBytesRemote(Future<void> Function(Source) fun, {required String url, String? mimeType}) async {
     try {
       final bytes = await http.readBytes(Uri.parse(url));
       await fun(BytesSource(bytes, mimeType: mimeType));
     } on Exception catch (e, stackTrace) {
       AudioLogger.error(e, stackTrace);
-      toast(
-        'Error loading bytes from URL: $e',
-        textKey: const Key('toast-error-bytes-remote'),
-      );
+      toast('Error loading bytes from URL: $e', textKey: const Key('toast-error-bytes-remote'));
     }
   }
 
@@ -189,40 +169,18 @@ class _SourcesTabState extends State<SourcesTab> with AutomaticKeepAliveClientMi
         subtitle: 'coins.mp3',
         source: UrlSource(mp3DataUri),
       ),
-      _createSourceTile(
-        setSourceKey: const Key('setSource-asset-wav'),
-        title: 'Asset WAV',
-        subtitle: 'laser.wav',
-        source: AssetSource(wavAsset2),
-      ),
-      _createSourceTile(
-        setSourceKey: const Key('setSource-asset-mp3'),
-        title: 'Asset MP3',
-        subtitle: 'nasa.mp3',
-        source: AssetSource(mp3Asset),
-      ),
+      _createSourceTile(setSourceKey: const Key('setSource-asset-wav'), title: 'Asset WAV', subtitle: 'laser.wav', source: AssetSource(wavAsset2)),
+      _createSourceTile(setSourceKey: const Key('setSource-asset-mp3'), title: 'Asset MP3', subtitle: 'nasa.mp3', source: AssetSource(mp3Asset)),
       _SourceTile(
-        setSource: () => _setSourceBytesAsset(
-          _setSource,
-          asset: wavAsset2,
-          mimeType: 'audio/wav',
-        ),
+        setSource: () => _setSourceBytesAsset(_setSource, asset: wavAsset2, mimeType: 'audio/wav'),
         setSourceKey: const Key('setSource-bytes-local'),
-        play: () => _setSourceBytesAsset(
-          _play,
-          asset: wavAsset2,
-          mimeType: 'audio/wav',
-        ),
+        play: () => _setSourceBytesAsset(_play, asset: wavAsset2, mimeType: 'audio/wav'),
         removeSource: _removeSourceWidget,
         title: 'Bytes - Local',
         subtitle: 'laser.wav',
       ),
       _SourceTile(
-        setSource: () => _setSourceBytesRemote(
-          _setSource,
-          url: mp3Url1,
-          mimeType: 'audio/mpeg',
-        ),
+        setSource: () => _setSourceBytesRemote(_setSource, url: mp3Url1, mimeType: 'audio/mpeg'),
         setSourceKey: const Key('setSource-bytes-remote'),
         play: () => _setSourceBytesRemote(_play, url: mp3Url1, mimeType: 'audio/mpeg'),
         removeSource: _removeSourceWidget,
@@ -245,9 +203,7 @@ class _SourcesTabState extends State<SourcesTab> with AutomaticKeepAliveClientMi
     return Stack(
       alignment: Alignment.bottomCenter,
       children: [
-        TabContent(
-          children: sourceWidgets.expand((element) => [element, const Divider()]).toList(),
-        ),
+        TabContent(children: sourceWidgets.expand((element) => [element, const Divider()]).toList()),
         Padding(
           padding: const EdgeInsets.all(16),
           child: FloatingActionButton(
@@ -258,13 +214,7 @@ class _SourcesTabState extends State<SourcesTab> with AutomaticKeepAliveClientMi
                   _SourceDialog(
                     onAdd: (source, path) {
                       setState(() {
-                        sourceWidgets.add(
-                          _createSourceTile(
-                            title: source.runtimeType.toString(),
-                            subtitle: path,
-                            source: source,
-                          ),
-                        );
+                        sourceWidgets.add(_createSourceTile(title: source.runtimeType.toString(), subtitle: path, source: source));
                       });
                     },
                   ),
@@ -447,9 +397,7 @@ class _SourceDialogState extends State<_SourceDialog> {
             const SizedBox(width: 16),
             Expanded(
               child: TextField(
-                decoration: const InputDecoration(
-                  hintText: 'https://example.com/myFile.wav',
-                ),
+                decoration: const InputDecoration(hintText: 'https://example.com/myFile.wav'),
                 onChanged: (url) => path = url,
               ),
             ),
@@ -476,9 +424,7 @@ class _SourceDialogState extends State<_SourceDialog> {
           children: [
             LabeledDropDown<_SourceType>(
               label: 'Source type',
-              options: {
-                for (final type in _SourceType.values) type: type.label,
-              },
+              options: {for (final type in _SourceType.values) type: type.label},
               selected: sourceType,
               onChange: (value) {
                 setState(() {
@@ -496,10 +442,7 @@ class _SourceDialogState extends State<_SourceDialog> {
                   onPressed: () async {
                     switch (sourceType) {
                       case _SourceType.bytes:
-                        widget.onAdd(
-                          BytesSource(await File(path).readAsBytes()),
-                          path,
-                        );
+                        widget.onAdd(BytesSource(await File(path).readAsBytes()), path);
                       case _SourceType.asset:
                         widget.onAdd(AssetSource(path), path);
                       case _SourceType.deviceFile:
@@ -513,10 +456,7 @@ class _SourceDialogState extends State<_SourceDialog> {
                   },
                   txt: 'Add',
                 ),
-                TextButton(
-                  onPressed: Navigator.of(context).pop,
-                  child: const Text('Cancel'),
-                ),
+                TextButton(onPressed: Navigator.of(context).pop, child: const Text('Cancel')),
               ],
             ),
           ],

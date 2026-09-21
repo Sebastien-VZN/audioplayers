@@ -32,10 +32,7 @@ class _PropertiesWidgetState extends State<PropertiesWidget> {
           title: FutureBuilder<Duration?>(
             future: widget.player.getDuration(),
             builder: (context, snap) {
-              return Text(
-                snap.data?.toString() ?? '-',
-                key: const Key('durationText'),
-              );
+              return Text(snap.data?.toString() ?? '-', key: const Key('durationText'));
             },
           ),
           subtitle: const Text('Duration'),
@@ -45,52 +42,34 @@ class _PropertiesWidgetState extends State<PropertiesWidget> {
           title: FutureBuilder<Duration?>(
             future: widget.player.getCurrentPosition(),
             builder: (context, snap) {
-              return Text(
-                snap.data?.toString() ?? '-',
-                key: const Key('positionText'),
-              );
+              return Text(snap.data?.toString() ?? '-', key: const Key('positionText'));
             },
           ),
           subtitle: const Text('Position'),
           leading: const Icon(Icons.timer),
         ),
         ListTile(
-          title: Text(
-            widget.player.state.toString(),
-            key: const Key('playerStateText'),
-          ),
+          title: Text(widget.player.state.toString(), key: const Key('playerStateText')),
           subtitle: const Text('State'),
           leading: Icon(widget.player.state.getIcon()),
         ),
         ListTile(
-          title: Text(
-            widget.player.source?.toString() ?? '-',
-            key: const Key('sourceText'),
-          ),
+          title: Text(widget.player.source?.toString() ?? '-', key: const Key('sourceText')),
           subtitle: const Text('Source'),
           leading: const Icon(Icons.audio_file),
         ),
         ListTile(
-          title: Text(
-            widget.player.volume.toString(),
-            key: const Key('volumeText'),
-          ),
+          title: Text(widget.player.volume.toString(), key: const Key('volumeText')),
           subtitle: const Text('Volume'),
           leading: const Icon(Icons.volume_up),
         ),
         ListTile(
-          title: Text(
-            widget.player.balance.toString(),
-            key: const Key('balanceText'),
-          ),
+          title: Text(widget.player.balance.toString(), key: const Key('balanceText')),
           subtitle: const Text('Balance'),
           leading: const Icon(Icons.balance),
         ),
         ListTile(
-          title: Text(
-            widget.player.playbackRate.toString(),
-            key: const Key('playbackRateText'),
-          ),
+          title: Text(widget.player.playbackRate.toString(), key: const Key('playbackRateText')),
           subtitle: const Text('Playback Rate'),
           leading: const Icon(Icons.speed),
         ),

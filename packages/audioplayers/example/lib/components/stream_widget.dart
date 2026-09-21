@@ -29,23 +29,13 @@ class _StreamWidgetState extends State<StreamWidget> {
   Future<bool> _init() async {
     // Use initial values from player
     streamState = player.state;
-    await player.getDuration().then(
-      (it) => setState(() => streamDuration = it),
-    );
-    await player.getCurrentPosition().then(
-      (it) => setState(() => streamPosition = it),
-    );
+    await player.getDuration().then((it) => setState(() => streamDuration = it));
+    await player.getCurrentPosition().then((it) => setState(() => streamPosition = it));
 
     streams = <StreamSubscription<dynamic>>[
-      player.onDurationChanged.listen(
-        (it) => setState(() => streamDuration = it),
-      ),
-      player.onPlayerStateChanged.listen(
-        (it) => setState(() => streamState = it),
-      ),
-      player.onPositionChanged.listen(
-        (it) => setState(() => streamPosition = it),
-      ),
+      player.onDurationChanged.listen((it) => setState(() => streamDuration = it)),
+      player.onPlayerStateChanged.listen((it) => setState(() => streamState = it)),
+      player.onPositionChanged.listen((it) => setState(() => streamPosition = it)),
     ];
 
     return true;
@@ -89,26 +79,17 @@ class _StreamWidgetState extends State<StreamWidget> {
           children: [
             const ListTile(title: Text('Streams')),
             ListTile(
-              title: Text(
-                streamDuration?.toString() ?? '-',
-                key: const Key('onDurationText'),
-              ),
+              title: Text(streamDuration?.toString() ?? '-', key: const Key('onDurationText')),
               subtitle: const Text('Duration Stream'),
               leading: const Icon(Icons.timelapse),
             ),
             ListTile(
-              title: Text(
-                streamPosition?.toString() ?? '-',
-                key: const Key('onPositionText'),
-              ),
+              title: Text(streamPosition?.toString() ?? '-', key: const Key('onPositionText')),
               subtitle: const Text('Position Stream'),
               leading: const Icon(Icons.timer),
             ),
             ListTile(
-              title: Text(
-                streamState?.toString() ?? '-',
-                key: const Key('onStateText'),
-              ),
+              title: Text(streamState?.toString() ?? '-', key: const Key('onStateText')),
               subtitle: const Text('State Stream'),
               leading: Icon(streamState?.getIcon() ?? Icons.stop),
             ),

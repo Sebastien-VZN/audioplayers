@@ -48,15 +48,12 @@ class _ExampleAppState extends State<_ExampleApp> {
 
   Future<bool> _init() async {
     audioPlayers = await Future.wait(
-      List.generate(
-        defaultPlayerCount,
-        (_) async {
-          final player = AudioPlayer();
+      List.generate(defaultPlayerCount, (_) async {
+        final player = AudioPlayer();
 
-          await player.setReleaseMode(ReleaseMode.stop);
-          return player;
-        },
-      ),
+        await player.setReleaseMode(ReleaseMode.stop);
+        return player;
+      }),
     );
 
     if (audioPlayers.isNotEmpty) {
@@ -66,15 +63,9 @@ class _ExampleAppState extends State<_ExampleApp> {
             player.onPlayerStateChanged.listen((it) {
               switch (it) {
                 case PlayerState.stopped:
-                  toast(
-                    'Player stopped!',
-                    textKey: Key('toast-player-stopped-$index'),
-                  );
+                  toast('Player stopped!', textKey: Key('toast-player-stopped-$index'));
                 case PlayerState.completed:
-                  toast(
-                    'Player complete!',
-                    textKey: Key('toast-player-complete-$index'),
-                  );
+                  toast('Player complete!', textKey: Key('toast-player-complete-$index'));
 
                 case PlayerState.playing:
                 case PlayerState.paused:
@@ -82,14 +73,7 @@ class _ExampleAppState extends State<_ExampleApp> {
               }
             }),
           )
-          ..add(
-            player.onSeekComplete.listen(
-              (it) => toast(
-                'Seek complete!',
-                textKey: Key('toast-seek-complete-$index'),
-              ),
-            ),
-          );
+          ..add(player.onSeekComplete.listen((it) => toast('Seek complete!', textKey: Key('toast-seek-complete-$index'))));
       });
       return true;
     }
@@ -135,12 +119,7 @@ class _ExampleAppState extends State<_ExampleApp> {
             onSelected: _handleAction,
             itemBuilder: (context) {
               return PopupAction.values.map((choice) {
-                return PopupMenuItem<PopupAction>(
-                  value: choice,
-                  child: Text(
-                    choice == PopupAction.add ? 'Add player' : 'Remove selected player',
-                  ),
-                );
+                return PopupMenuItem<PopupAction>(value: choice, child: Text(choice == PopupAction.add ? 'Add player' : 'Remove selected player'));
               }).toList();
             },
           ),
@@ -166,12 +145,7 @@ class _ExampleAppState extends State<_ExampleApp> {
                     scrollDirection: Axis.horizontal,
                     child: Tgl(
                       key: const Key('playerTgl'),
-                      options:
-                          [
-                            for (var i = 1; i <= audioPlayers.length; i++) i,
-                          ].asMap().map(
-                            (key, val) => MapEntry('player-$key', 'P$val'),
-                          ),
+                      options: [for (var i = 1; i <= audioPlayers.length; i++) i].asMap().map((key, val) => MapEntry('player-$key', 'P$val')),
                       selected: selectedPlayerIdx,
                       onChange: (v) => setState(() => selectedPlayerIdx = v),
                     ),

@@ -82,27 +82,16 @@ class StreamRoute {
           final end = int.tryParse(parts[1]) ?? fileSize - 1;
 
           if (start >= fileSize) {
-            return Response(
-              416,
-              body: 'Requested range not satisfiable\n$start >= $fileSize',
-            );
+            return Response(416, body: 'Requested range not satisfiable\n$start >= $fileSize');
           }
 
           final streamReader = ChunkedStreamReader<int>(file.openRead());
           final chunkLength = end - start + 1;
-          final head = {
-            'Content-Range': 'bytes $start-$end/$fileSize',
-            'Accept-Ranges': 'bytes',
-            'Content-Length': '$chunkLength',
-            ...contentType,
-          };
+          final head = {'Content-Range': 'bytes $start-$end/$fileSize', 'Accept-Ranges': 'bytes', 'Content-Length': '$chunkLength', ...contentType};
           if (start > 0) {
             await streamReader.readChunk(start);
           }
-          final res = Response.ok(
-            await streamReader.readChunk(chunkLength),
-            headers: head,
-          );
+          final res = Response.ok(await streamReader.readChunk(chunkLength), headers: head);
           return res;
         } else {
           final bytes = await file.readAsBytes();
