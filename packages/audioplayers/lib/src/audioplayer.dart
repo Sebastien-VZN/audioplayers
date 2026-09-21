@@ -133,9 +133,7 @@ class AudioPlayer {
   /// Stream of seek completions.
   ///
   /// An event is going to be sent as soon as the audio seek is finished.
-  Stream<void> get onSeekComplete => eventStream.where(
-    (event) => event.eventType == AudioEventType.seekComplete,
-  );
+  Stream<void> get onSeekComplete => eventStream.where((event) => event.eventType == AudioEventType.seekComplete);
 
   Stream<bool> get _onPrepared => eventStream.where((event) => event.eventType == AudioEventType.prepared).map((event) => event.isPrepared!);
 
@@ -176,10 +174,7 @@ class AudioPlayer {
             _eventStreamController.add,
             onError: (Object e, [StackTrace? stackTrace]) {
               // Log error but DON'T propagate to prevent unhandled exception
-              AudioLogger.error(
-                AudioPlayerException(this, cause: e),
-                stackTrace,
-              );
+              AudioLogger.error(AudioPlayerException(this, cause: e), stackTrace);
             },
           );
       creatingCompleter.complete();
@@ -192,14 +187,7 @@ class AudioPlayer {
   ///
   /// To reduce preparation latency, instead consider calling [setSource]
   /// beforehand and then [resume] separately.
-  Future<void> play(
-    Source source, {
-    double? volume,
-    double? balance,
-    AudioContext? ctx,
-    Duration? position,
-    PlayerMode? mode,
-  }) async {
+  Future<void> play(Source source, {double? volume, double? balance, AudioContext? ctx, Duration? position, PlayerMode? mode}) async {
     desiredState = PlayerState.playing;
 
     if (mode != null) {
@@ -232,13 +220,13 @@ class AudioPlayer {
 
   Future<void> setAudioContext(AudioContext ctx) async {
     await creatingCompleter.future;
-    return _platform.setAudioContext(playerId, ctx);
+    return await _platform.setAudioContext(playerId, ctx);
   }
 
   Future<void> setPlayerMode(PlayerMode mode) async {
     _mode = mode;
     await creatingCompleter.future;
-    return _platform.setPlayerMode(playerId, mode);
+    return await _platform.setPlayerMode(playerId, mode);
   }
 
   /// Pauses the audio that is currently playing.
@@ -300,9 +288,7 @@ class AudioPlayer {
   Future<void> seek(Duration position) async {
     await creatingCompleter.future;
 
-    final futureSeekComplete = onSeekComplete.first.timeout(
-      AudioPlayer.seekingTimeout,
-    );
+    final futureSeekComplete = onSeekComplete.first.timeout(AudioPlayer.seekingTimeout);
     final futureSeek = _platform.seek(playerId, position);
     // Wait simultaneously to ensure all errors are propagated through the same
     // future.
@@ -319,7 +305,7 @@ class AudioPlayer {
   Future<void> setBalance(double balance) async {
     _balance = balance;
     await creatingCompleter.future;
-    return _platform.setBalance(playerId, balance);
+    return await _platform.setBalance(playerId, balance);
   }
 
   /// Sets the volume (amplitude).
@@ -329,7 +315,7 @@ class AudioPlayer {
   Future<void> setVolume(double volume) async {
     _volume = volume;
     await creatingCompleter.future;
-    return _platform.setVolume(playerId, volume);
+    return await _platform.setVolume(playerId, volume);
   }
 
   /// Sets the release mode.
@@ -338,7 +324,7 @@ class AudioPlayer {
   Future<void> setReleaseMode(ReleaseMode releaseMode) async {
     _releaseMode = releaseMode;
     await creatingCompleter.future;
-    return _platform.setReleaseMode(playerId, releaseMode);
+    return await _platform.setReleaseMode(playerId, releaseMode);
   }
 
   /// Sets the playback rate - call this after first calling play() or resume().
@@ -348,7 +334,7 @@ class AudioPlayer {
   Future<void> setPlaybackRate(double playbackRate) async {
     _playbackRate = playbackRate;
     await creatingCompleter.future;
-    return _platform.setPlaybackRate(playerId, playbackRate);
+    return await _platform.setPlaybackRate(playerId, playbackRate);
   }
 
   /// Sets the audio source for this player.
@@ -402,14 +388,7 @@ class AudioPlayer {
 
     _source = UrlSource(url, mimeType: mimeType);
     // Encode remote url to avoid unexpected failures.
-    await _completePrepared(
-      () => _platform.setSourceUrl(
-        playerId,
-        UriCoder.encodeOnce(url),
-        mimeType: mimeType,
-        isLocal: false,
-      ),
-    );
+    await _completePrepared(() => _platform.setSourceUrl(playerId, UriCoder.encodeOnce(url), mimeType: mimeType, isLocal: false));
   }
 
   /// Sets the URL to a file in the users device.
@@ -418,14 +397,7 @@ class AudioPlayer {
   /// this method.
   Future<void> setSourceDeviceFile(String path, {String? mimeType}) async {
     _source = DeviceFileSource(path, mimeType: mimeType);
-    await _completePrepared(
-      () => _platform.setSourceUrl(
-        playerId,
-        path,
-        isLocal: true,
-        mimeType: mimeType,
-      ),
-    );
+    await _completePrepared(() => _platform.setSourceUrl(playerId, path, isLocal: true, mimeType: mimeType));
   }
 
   /// Sets the URL to an asset in your Flutter application.
@@ -436,14 +408,7 @@ class AudioPlayer {
   Future<void> setSourceAsset(String path, {String? mimeType}) async {
     _source = AssetSource(path, mimeType: mimeType);
     final cachePath = await audioCache.loadPath(path);
-    await _completePrepared(
-      () => _platform.setSourceUrl(
-        playerId,
-        cachePath,
-        mimeType: mimeType,
-        isLocal: true,
-      ),
-    );
+    await _completePrepared(() => _platform.setSourceUrl(playerId, cachePath, mimeType: mimeType, isLocal: true));
   }
 
   Future<void> setSourceBytes(Uint8List bytes, {String? mimeType}) async {
@@ -453,17 +418,13 @@ class AudioPlayer {
             defaultTargetPlatform == TargetPlatform.linux)) {
       // Convert to file as workaround
       final tempDir = (await getTemporaryDirectory()).path;
-      final bytesHash = Object.hashAll(
-        bytes,
-      ).toUnsigned(20).toRadixString(16).padLeft(5, '0');
+      final bytesHash = Object.hashAll(bytes).toUnsigned(20).toRadixString(16).padLeft(5, '0');
       final file = File('$tempDir/$bytesHash');
       await file.writeAsBytes(bytes);
       await setSourceDeviceFile(file.path, mimeType: mimeType);
     } else {
       _source = BytesSource(bytes, mimeType: mimeType);
-      await _completePrepared(
-        () => _platform.setSourceBytes(playerId, bytes, mimeType: mimeType),
-      );
+      await _completePrepared(() => _platform.setSourceBytes(playerId, bytes, mimeType: mimeType));
     }
   }
 

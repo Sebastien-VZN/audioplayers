@@ -14,5 +14,5 @@ dependencies:
   shelf_static: ^1.0.0
 
 dev_dependencies:
-  very_good_analysis: ^10.2.0
+  very_good_analysis: ^11.0.0
   http: '>=0.13.1 <2.0.0'

@@ -14,7 +14,7 @@ dependencies:
   plugin_platform_interface: ^2.0.2
 
 dev_dependencies:
-  very_good_analysis: ^10.2.0
+  very_good_analysis: ^11.0.0
   flutter_test:
     sdk: flutter
 

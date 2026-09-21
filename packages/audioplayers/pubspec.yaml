@@ -49,7 +49,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   mocktail: ^1.0.4
-  very_good_analysis: ^10.2.0
+  very_good_analysis: ^11.0.0
 
 environment:
   sdk: ^3.12.0

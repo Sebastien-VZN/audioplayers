@@ -159,20 +159,18 @@ class AudioCache {
       debugPrint('❌ This method cannot be used on web!');
     }
     final uri = await load(fileName);
-    return fileSystem.file(
-      uri.toFilePath(windows: defaultTargetPlatform == TargetPlatform.windows),
-    );
+    return fileSystem.file(uri.toFilePath(windows: defaultTargetPlatform == TargetPlatform.windows));
   }
 
   /// Loads a single [fileName] to the cache but returns it as a list of bytes.
   Future<Uint8List> loadAsBytes(String fileName) async {
-    return (await loadAsFile(fileName)).readAsBytes();
+    return await (await loadAsFile(fileName)).readAsBytes();
   }
 
   /// Loads all the [fileNames] provided to the cache.
   ///
   /// Also returns a list of [Future]s for those files.
   Future<List<Uri>> loadAll(List<String> fileNames) async {
-    return Future.wait(fileNames.map(load));
+    return await Future.wait(fileNames.map(load));
   }
 }

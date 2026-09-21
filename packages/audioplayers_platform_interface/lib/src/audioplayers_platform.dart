@@ -26,9 +26,7 @@ class AudioplayersPlatform extends AudioplayersPlatformInterface with MethodChan
 }
 
 mixin MethodChannelAudioplayersPlatform implements MethodChannelAudioplayersPlatformInterface {
-  static const MethodChannel _methodChannel = MethodChannel(
-    'xyz.luan/audioplayers',
-  );
+  static const MethodChannel _methodChannel = MethodChannel('xyz.luan/audioplayers');
 
   @override
   Future<void> create(String playerId) {
@@ -67,9 +65,7 @@ mixin MethodChannelAudioplayersPlatform implements MethodChannelAudioplayersPlat
 
   @override
   Future<void> seek(String playerId, Duration position) {
-    return _call('seek', playerId, <String, dynamic>{
-      'position': position.inMilliseconds,
-    });
+    return _call('seek', playerId, <String, dynamic>{'position': position.inMilliseconds});
   }
 
   @override
@@ -84,49 +80,27 @@ mixin MethodChannelAudioplayersPlatform implements MethodChannelAudioplayersPlat
 
   @override
   Future<void> setPlayerMode(String playerId, PlayerMode playerMode) {
-    return _call('setPlayerMode', playerId, <String, dynamic>{
-      'playerMode': playerMode.toString(),
-    });
+    return _call('setPlayerMode', playerId, <String, dynamic>{'playerMode': playerMode.toString()});
   }
 
   @override
   Future<void> setPlaybackRate(String playerId, double playbackRate) {
-    return _call('setPlaybackRate', playerId, <String, dynamic>{
-      'playbackRate': playbackRate,
-    });
+    return _call('setPlaybackRate', playerId, <String, dynamic>{'playbackRate': playbackRate});
   }
 
   @override
   Future<void> setReleaseMode(String playerId, ReleaseMode releaseMode) {
-    return _call('setReleaseMode', playerId, <String, dynamic>{
-      'releaseMode': releaseMode.toString(),
-    });
+    return _call('setReleaseMode', playerId, <String, dynamic>{'releaseMode': releaseMode.toString()});
   }
 
   @override
-  Future<void> setSourceBytes(
-    String playerId,
-    Uint8List bytes, {
-    String? mimeType,
-  }) {
-    return _call('setSourceBytes', playerId, <String, dynamic>{
-      'bytes': bytes,
-      'mimeType': mimeType,
-    });
+  Future<void> setSourceBytes(String playerId, Uint8List bytes, {String? mimeType}) {
+    return _call('setSourceBytes', playerId, <String, dynamic>{'bytes': bytes, 'mimeType': mimeType});
   }
 
   @override
-  Future<void> setSourceUrl(
-    String playerId,
-    String url, {
-    bool? isLocal,
-    String? mimeType,
-  }) {
-    return _call('setSourceUrl', playerId, <String, dynamic>{
-      'url': url,
-      'isLocal': isLocal,
-      'mimeType': mimeType,
-    });
+  Future<void> setSourceUrl(String playerId, String url, {bool? isLocal, String? mimeType}) {
+    return _call('setSourceUrl', playerId, <String, dynamic>{'url': url, 'isLocal': isLocal, 'mimeType': mimeType});
   }
 
   @override
@@ -146,28 +120,17 @@ mixin MethodChannelAudioplayersPlatform implements MethodChannelAudioplayersPlat
 
   @override
   Future<void> emitError(String playerId, String code, String message) {
-    return _call('emitError', playerId, <String, dynamic>{
-      'code': code,
-      'message': message,
-    });
+    return _call('emitError', playerId, <String, dynamic>{'code': code, 'message': message});
   }
 
-  Future<void> _call(
-    String method,
-    String playerId, [
-    Map<String, dynamic> arguments = const <String, dynamic>{},
-  ]) async {
+  Future<void> _call(String method, String playerId, [Map<String, dynamic> arguments = const <String, dynamic>{}]) async {
     final enhancedArgs = <String, dynamic>{'playerId': playerId, ...arguments};
-    return _methodChannel.call(method, enhancedArgs);
+    return await _methodChannel.call(method, enhancedArgs);
   }
 
-  Future<T?> _compute<T>(
-    String method,
-    String playerId, [
-    Map<String, dynamic> arguments = const <String, dynamic>{},
-  ]) async {
+  Future<T?> _compute<T>(String method, String playerId, [Map<String, dynamic> arguments = const <String, dynamic>{}]) async {
     final enhancedArgs = <String, dynamic>{'playerId': playerId, ...arguments};
-    return _methodChannel.compute<T>(method, enhancedArgs);
+    return await _methodChannel.compute<T>(method, enhancedArgs);
   }
 }
 
@@ -177,9 +140,7 @@ mixin EventChannelAudioplayersPlatform {
   // Only can be used after have created the event channel on the native side.
   void createEventStream(String playerId) {
     final eventChannel = EventChannel('xyz.luan/audioplayers/events/$playerId');
-    streams[playerId] = eventChannel.receiveBroadcastStream().map((
-      dynamic event,
-    ) {
+    streams[playerId] = eventChannel.receiveBroadcastStream().map((dynamic event) {
       final map = event as Map<dynamic, dynamic>;
       final eventType = map.getString('event');
       switch (eventType) {
@@ -195,10 +156,7 @@ mixin EventChannelAudioplayersPlatform {
           return const AudioEvent(eventType: AudioEventType.seekComplete);
         case 'audio.onPrepared':
           final isPrepared = map.getBool('value');
-          return AudioEvent(
-            eventType: AudioEventType.prepared,
-            isPrepared: isPrepared,
-          );
+          return AudioEvent(eventType: AudioEventType.prepared, isPrepared: isPrepared);
         case 'audio.onLog':
           final value = map.getString('value');
           return AudioEvent(eventType: AudioEventType.log, logMessage: value);

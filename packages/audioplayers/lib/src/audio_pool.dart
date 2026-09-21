@@ -92,19 +92,13 @@ class AudioPool {
     int minPlayers = 1,
     PlayerMode playerMode = PlayerMode.mediaPlayer,
   }) async {
-    return create(
-      source: AssetSource(path),
-      audioCache: audioCache,
-      minPlayers: minPlayers,
-      maxPlayers: maxPlayers,
-      playerMode: playerMode,
-    );
+    return await create(source: AssetSource(path), audioCache: audioCache, minPlayers: minPlayers, maxPlayers: maxPlayers, playerMode: playerMode);
   }
 
   /// Starts playing the audio, returns a function that can stop the audio.
   /// You must dispose the audio player yourself if using PlayerMode.lowLatency.
   Future<StopFunction> start({double volume = 1.0}) async {
-    return _lock.synchronized(() async {
+    return await _lock.synchronized(() async {
       if (availablePlayers.isEmpty) {
         availablePlayers.add(await _createNewAudioPlayer());
       }
@@ -131,7 +125,7 @@ class AudioPool {
       }
 
       if (playerMode != PlayerMode.lowLatency) {
-        subscription = player.onPlayerComplete.listen((_) async => stop());
+        subscription = player.onPlayerComplete.listen((_) async => await stop());
       }
 
       return stop;
@@ -154,10 +148,7 @@ class AudioPool {
   /// Disposes the audio pool. Then it cannot be used anymore.
   Future<void> dispose() async {
     // Dispose all players
-    await Future.wait([
-      ...currentPlayers.values.map((e) => e.dispose()),
-      ...availablePlayers.map((e) => e.dispose()),
-    ]);
+    await Future.wait([...currentPlayers.values.map((e) => e.dispose()), ...availablePlayers.map((e) => e.dispose())]);
     currentPlayers.clear();
     availablePlayers.clear();
   }
