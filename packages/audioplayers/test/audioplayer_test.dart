@@ -56,13 +56,7 @@ void main() {
         mimeType: any(named: 'mimeType'),
       ),
     ).thenAnswer((_) async {});
-    when(
-      () => mockPlatform.setSourceBytes(
-        any(),
-        any(),
-        mimeType: any(named: 'mimeType'),
-      ),
-    ).thenAnswer((_) async {});
+    when(() => mockPlatform.setSourceBytes(any(), any(), mimeType: any(named: 'mimeType'))).thenAnswer((_) async {});
     when(() => mockPlatform.resume(any())).thenAnswer((_) async {});
     when(() => mockPlatform.pause(any())).thenAnswer((_) async {});
     when(() => mockPlatform.stop(any())).thenAnswer((_) async {});
@@ -91,12 +85,7 @@ void main() {
 
       final playFuture = player.play(UrlSource('https://example.com/audio.mp3'));
       await Future<void>.delayed(const Duration(milliseconds: 100));
-      eventController.add(
-        const AudioEvent(
-          eventType: AudioEventType.prepared,
-          isPrepared: true,
-        ),
-      );
+      eventController.add(const AudioEvent(eventType: AudioEventType.prepared, isPrepared: true));
 
       await playFuture;
 
@@ -118,12 +107,7 @@ void main() {
 
       final playFuture = player.play(AssetSource('sounds/test.mp3'));
       await Future<void>.delayed(const Duration(milliseconds: 100));
-      eventController.add(
-        const AudioEvent(
-          eventType: AudioEventType.prepared,
-          isPrepared: true,
-        ),
-      );
+      eventController.add(const AudioEvent(eventType: AudioEventType.prepared, isPrepared: true));
 
       await playFuture;
 
@@ -145,22 +129,11 @@ void main() {
 
       final playFuture = player.play(BytesSource(bytes));
       await Future<void>.delayed(const Duration(milliseconds: 100));
-      eventController.add(
-        const AudioEvent(
-          eventType: AudioEventType.prepared,
-          isPrepared: true,
-        ),
-      );
+      eventController.add(const AudioEvent(eventType: AudioEventType.prepared, isPrepared: true));
 
       await playFuture;
 
-      verify(
-        () => mockPlatform.setSourceBytes(
-          player.playerId,
-          bytes,
-          mimeType: any(named: 'mimeType'),
-        ),
-      ).called(1);
+      verify(() => mockPlatform.setSourceBytes(player.playerId, bytes, mimeType: any(named: 'mimeType'))).called(1);
       verify(() => mockPlatform.resume(player.playerId)).called(1);
     });
 
@@ -181,15 +154,11 @@ void main() {
 
       final seekFuture = player.seek(const Duration(seconds: 10));
       await Future<void>.delayed(const Duration(milliseconds: 100));
-      eventController.add(
-        const AudioEvent(eventType: AudioEventType.seekComplete),
-      );
+      eventController.add(const AudioEvent(eventType: AudioEventType.seekComplete));
 
       await seekFuture;
 
-      verify(
-        () => mockPlatform.seek(player.playerId, const Duration(seconds: 10)),
-      ).called(1);
+      verify(() => mockPlatform.seek(player.playerId, const Duration(seconds: 10))).called(1);
     });
 
     test('setVolume/Balance/Rate call platform', () async {

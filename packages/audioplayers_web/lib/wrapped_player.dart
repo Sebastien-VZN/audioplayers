@@ -30,9 +30,7 @@ class WrappedPlayer {
 
   Future<void> setUrl(String url) async {
     if (_currentUrl == url) {
-      eventStreamController.add(
-        const AudioEvent(eventType: AudioEventType.prepared, isPrepared: true),
-      );
+      eventStreamController.add(const AudioEvent(eventType: AudioEventType.prepared, isPrepared: true));
       return;
     }
     _currentUrl = url;
@@ -92,80 +90,42 @@ class WrappedPlayer {
   }
 
   void _setupStreams(web.HTMLAudioElement p) {
-    _playerLoadedDataSubscription = p.onLoadedData.listen(
-      (_) {
-        eventStreamController
-          ..add(
-            const AudioEvent(
-              eventType: AudioEventType.prepared,
-              isPrepared: true,
-            ),
-          )
-          ..add(
-            AudioEvent(
-              eventType: AudioEventType.duration,
-              duration: p.duration.fromSecondsToDuration(),
-            ),
-          );
-      },
-      onError: eventStreamController.addError,
-    );
-    _playerPlaySubscription = p.onPlay.listen(
-      (_) {
-        eventStreamController.add(
-          AudioEvent(
-            eventType: AudioEventType.duration,
-            duration: p.duration.fromSecondsToDuration(),
-          ),
-        );
-      },
-      onError: eventStreamController.addError,
-    );
-    _playerSeekedSubscription = p.onSeeked.listen(
-      (_) {
-        eventStreamController.add(
-          const AudioEvent(
-            eventType: AudioEventType.seekComplete,
-          ),
-        );
-      },
-      onError: eventStreamController.addError,
-    );
-    _playerEndedSubscription = p.onEnded.listen(
-      (_) async {
-        if (_currentReleaseMode == ReleaseMode.release) {
-          await release();
-        } else {
-          await stop();
-        }
-        eventStreamController.add(
-          const AudioEvent(
-            eventType: AudioEventType.complete,
-          ),
-        );
-      },
-      onError: eventStreamController.addError,
-    );
-    _playerErrorSubscription = p.onError.listen(
-      (_) {
-        String platformMsg;
-        if (p.error != null) {
-          platformMsg = 'Failed to set source.';
-        } else {
-          platformMsg = 'Unknown web error. See details.';
-        }
-        eventStreamController.addError(
-          PlatformException(
-            code: 'WebAudioError',
-            message: platformMsg,
-            details:
-                '${p.error?.runtimeType}: '
-                '${p.error?.message} (Code: ${p.error?.code})',
-          ),
-        );
-      },
-      onError: eventStreamController.addError,
-    );
+    _playerLoadedDataSubscription = p.onLoadedData.listen((_) {
+      eventStreamController
+        ..add(const AudioEvent(eventType: AudioEventType.prepared, isPrepared: true))
+        ..add(AudioEvent(eventType: AudioEventType.duration, duration: p.duration.fromSecondsToDuration()));
+    }, onError: eventStreamController.addError);
+    _playerPlaySubscription = p.onPlay.listen((_) {
+      eventStreamController.add(AudioEvent(eventType: AudioEventType.duration, duration: p.duration.fromSecondsToDuration()));
+    }, onError: eventStreamController.addError);
+    _playerSeekedSubscription = p.onSeeked.listen((_) {
+      eventStreamController.add(const AudioEvent(eventType: AudioEventType.seekComplete));
+    }, onError: eventStreamController.addError);
+    _playerEndedSubscription = p.onEnded.listen((_) async {
+      if (_currentReleaseMode == ReleaseMode.release) {
+        await release();
+      } else {
+        await stop();
+      }
+      eventStreamController.add(const AudioEvent(eventType: AudioEventType.complete));
+    }, onError: eventStreamController.addError);
+    _playerErrorSubscription = p.onError.listen((_) {
+      String platformMsg;
+      if (p.error != null) {
+        platformMsg = 'Failed to set source.';
+      } else {
+        platformMsg = 'Unknown web error. See details.';
+      }
+      eventStreamController.addError(
+        PlatformException(
+          code: 'WebAudioError',
+          message: platformMsg,
+          details:
+              '${p.error?.runtimeType}: '
+              '${p.error?.message} (Code: ${p.error?.code})',
+        ),
+      );
+    }, onError: eventStreamController.addError);
   }
 
   bool shouldLoop() => _currentReleaseMode == ReleaseMode.loop;
@@ -250,9 +210,7 @@ class WrappedPlayer {
   }
 
   void log(String message) {
-    eventStreamController.add(
-      AudioEvent(eventType: AudioEventType.log, logMessage: message),
-    );
+    eventStreamController.add(AudioEvent(eventType: AudioEventType.log, logMessage: message));
   }
 
   Future<void> dispose() async {

@@ -11,9 +11,7 @@ class GlobalAudioplayersPlatform extends GlobalAudioplayersPlatformInterface
 }
 
 mixin MethodChannelGlobalAudioplayersPlatform implements MethodChannelGlobalAudioplayersPlatformInterface {
-  static const MethodChannel _globalMethodChannel = MethodChannel(
-    'xyz.luan/audioplayers.global',
-  );
+  static const MethodChannel _globalMethodChannel = MethodChannel('xyz.luan/audioplayers.global');
 
   @override
   Future<void> init() {
@@ -27,24 +25,17 @@ mixin MethodChannelGlobalAudioplayersPlatform implements MethodChannelGlobalAudi
 
   @override
   Future<void> emitGlobalLog(String message) {
-    return _globalMethodChannel.call('emitLog', <String, dynamic>{
-      'message': message,
-    });
+    return _globalMethodChannel.call('emitLog', <String, dynamic>{'message': message});
   }
 
   @override
   Future<void> emitGlobalError(String code, String message) {
-    return _globalMethodChannel.call('emitError', <String, dynamic>{
-      'code': code,
-      'message': message,
-    });
+    return _globalMethodChannel.call('emitError', <String, dynamic>{'code': code, 'message': message});
   }
 }
 
 mixin EventChannelGlobalAudioplayersPlatform {
-  static const _globalEventChannel = EventChannel(
-    'xyz.luan/audioplayers.global/events',
-  );
+  static const _globalEventChannel = EventChannel('xyz.luan/audioplayers.global/events');
 
   Stream<GlobalAudioEvent> getGlobalEventStream() {
     return _globalEventChannel.receiveBroadcastStream().map((dynamic event) {
@@ -53,14 +44,9 @@ mixin EventChannelGlobalAudioplayersPlatform {
       switch (eventType) {
         case 'audio.onLog':
           final value = map.getString('value');
-          return GlobalAudioEvent(
-            eventType: GlobalAudioEventType.log,
-            logMessage: value,
-          );
+          return GlobalAudioEvent(eventType: GlobalAudioEventType.log, logMessage: value);
         default:
-          throw UnimplementedError(
-            'Global Event Method does not exist $eventType',
-          );
+          throw UnimplementedError('Global Event Method does not exist $eventType');
       }
     });
   }

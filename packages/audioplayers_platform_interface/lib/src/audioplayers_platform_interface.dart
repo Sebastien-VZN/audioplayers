@@ -89,19 +89,10 @@ abstract class MethodChannelAudioplayersPlatformInterface {
   ///
   /// The resources will start being fetched or buffered as soon as you call
   /// this method.
-  Future<void> setSourceUrl(
-    String playerId,
-    String url, {
-    bool? isLocal,
-    String? mimeType,
-  });
+  Future<void> setSourceUrl(String playerId, String url, {bool? isLocal, String? mimeType});
 
   /// Configures the play to read the audio from a byte array.
-  Future<void> setSourceBytes(
-    String playerId,
-    Uint8List bytes, {
-    String? mimeType,
-  });
+  Future<void> setSourceBytes(String playerId, Uint8List bytes, {String? mimeType});
 
   Future<void> setAudioContext(String playerId, AudioContext audioContext);
 

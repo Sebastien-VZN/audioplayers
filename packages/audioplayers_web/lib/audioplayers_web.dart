@@ -27,10 +27,7 @@ class WebAudioplayersPlatform extends AudioplayersPlatformInterface {
   WrappedPlayer getPlayer(String playerId) {
     return players[playerId] != null
         ? players[playerId]!
-        : throw PlatformException(
-            code: 'WebAudioError',
-            message: 'Player has not yet been created or has already been disposed.',
-          );
+        : throw PlatformException(code: 'WebAudioError', message: 'Player has not yet been created or has already been disposed.');
   }
 
   @override
@@ -72,16 +69,10 @@ class WebAudioplayersPlatform extends AudioplayersPlatformInterface {
   }
 
   @override
-  Future<void> setAudioContext(
-    String playerId,
-    AudioContext audioContext,
-  ) async {
-    getPlayer(playerId).eventStreamController.add(
-      const AudioEvent(
-        eventType: AudioEventType.log,
-        logMessage: 'Setting AudioContext is not supported on Web',
-      ),
-    );
+  Future<void> setAudioContext(String playerId, AudioContext audioContext) async {
+    getPlayer(
+      playerId,
+    ).eventStreamController.add(const AudioEvent(eventType: AudioEventType.log, logMessage: 'Setting AudioContext is not supported on Web'));
   }
 
   @override
@@ -100,21 +91,12 @@ class WebAudioplayersPlatform extends AudioplayersPlatformInterface {
   }
 
   @override
-  Future<void> setSourceUrl(
-    String playerId,
-    String url, {
-    bool? isLocal,
-    String? mimeType,
-  }) async {
+  Future<void> setSourceUrl(String playerId, String url, {bool? isLocal, String? mimeType}) async {
     await getPlayer(playerId).setUrl(url);
   }
 
   @override
-  Future<void> setSourceBytes(
-    String playerId,
-    Uint8List bytes, {
-    String? mimeType,
-  }) async {
+  Future<void> setSourceBytes(String playerId, Uint8List bytes, {String? mimeType}) async {
     // Convert to data uri as workaround.
     final uri = Uri.dataFromBytes(bytes, mimeType: mimeType ?? 'audio/mpeg');
     await getPlayer(playerId).setUrl(uri.toString());
@@ -142,9 +124,7 @@ class WebAudioplayersPlatform extends AudioplayersPlatformInterface {
 
   @override
   Future<void> emitError(String playerId, String code, String message) async {
-    getPlayer(playerId).eventStreamController.addError(
-      PlatformException(code: code, message: message),
-    );
+    getPlayer(playerId).eventStreamController.addError(PlatformException(code: code, message: message));
   }
 
   @override

@@ -8,12 +8,7 @@ class AudioEvent {
   /// Creates an instance of [AudioEvent].
   ///
   /// The [eventType] argument is required.
-  const AudioEvent({
-    required this.eventType,
-    this.duration,
-    this.logMessage,
-    this.isPrepared,
-  });
+  const AudioEvent({required this.eventType, this.duration, this.logMessage, this.isPrepared});
 
   /// The type of the event.
   final AudioEventType eventType;

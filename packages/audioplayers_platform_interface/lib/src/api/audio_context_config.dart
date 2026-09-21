@@ -61,12 +61,7 @@ class AudioContextConfig {
   ///    Info.plist (check our FAQ for more details on that)
   final bool stayAwake;
 
-  AudioContextConfig copy({
-    AudioContextConfigRoute? route,
-    AudioContextConfigFocus? focus,
-    bool? respectSilence,
-    bool? stayAwake,
-  }) {
+  AudioContextConfig copy({AudioContextConfigRoute? route, AudioContextConfigFocus? focus, bool? respectSilence, bool? stayAwake}) {
     return AudioContextConfig(
       route: route ?? this.route,
       focus: focus ?? this.focus,
@@ -116,18 +111,9 @@ class AudioContextConfig {
     const tip =
         'Please create a custom [AudioContextIOS] if the generic flags '
         'cannot represent your needs.';
-    assert(
-      !(respectSilence && focus == AudioContextConfigFocus.duckOthers),
-      '$invalidMsg `respectSilence` and `duckOthers`. $tip',
-    );
-    assert(
-      !(respectSilence && focus == AudioContextConfigFocus.mixWithOthers),
-      '$invalidMsg `respectSilence` and `mixWithOthers`. $tip',
-    );
-    assert(
-      !(respectSilence && route == AudioContextConfigRoute.speaker),
-      '$invalidMsg `respectSilence` and route `speaker`. $tip',
-    );
+    assert(!(respectSilence && focus == AudioContextConfigFocus.duckOthers), '$invalidMsg `respectSilence` and `duckOthers`. $tip');
+    assert(!(respectSilence && focus == AudioContextConfigFocus.mixWithOthers), '$invalidMsg `respectSilence` and `mixWithOthers`. $tip');
+    assert(!(respectSilence && route == AudioContextConfigRoute.speaker), '$invalidMsg `respectSilence` and route `speaker`. $tip');
   }
 
   @override
